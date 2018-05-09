@@ -1,0 +1,99 @@
+package com.leonchai.todolists;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+
+/**
+ * A login screen that offers login via email/password.
+ */
+public class LoginActivity extends AppCompatActivity {
+
+    private FirebaseAuth auth;
+    private AutoCompleteTextView mEmailView;
+    private EditText mPasswordView;
+    private TextView mRegister;
+    private View mProgressView;
+    private View mLoginFormView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        auth = FirebaseAuth.getInstance();
+        if(auth.getCurrentUser() != null){
+            //if already login
+        }
+
+        setContentView(R.layout.activity_login);
+        // Set up the login form.
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mPasswordView = (EditText) findViewById(R.id.password);
+        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
+        mRegister = findViewById(R.id.RegisterTextView);
+
+        mRegister.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            }
+        });
+
+        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email = mEmailView.getText().toString();
+                final String password = mPasswordView.getText().toString();
+
+                if(TextUtils.isEmpty(email)){
+                    Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(TextUtils.isEmpty(password)){
+                    Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                mProgressView.setVisibility(View.VISIBLE);
+
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        mProgressView.setVisibility(View.GONE);
+
+                        //if there was an error
+                        if(!task.isSuccessful()){
+                            if(password.length() < 6) {
+                                mPasswordView.setError(getString(R.string.error_invalid_password));
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Incorrect Login!", Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            //Intent intent = new Intent(LoginActivity.this, //Main Activity)
+
+                            finish();
+                        }
+                    }
+                });
+            }
+        });
+    }
+}
+
