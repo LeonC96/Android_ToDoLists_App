@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         if(auth.getCurrentUser() != null){
-            Toast.makeText(getApplicationContext(), auth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
+
         }
 
         setContentView(R.layout.activity_login);
@@ -70,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 mProgressView.setVisibility(View.VISIBLE);
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                 auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -85,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         } else {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-
+                            startActivity(intent);
                             finish();
                         }
                     }

@@ -101,7 +101,6 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            android:layout_centerInParent="true"
             android:layout_marginBottom="125dp"
             android:visibility="gone"/>
     </RelativeLayout>
