@@ -27,7 +27,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private TextView mRegister;
     private View mProgressView;
-    private View mLoginFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         if(auth.getCurrentUser() != null){
-            //if already login
+            Toast.makeText(getApplicationContext(), auth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
         }
 
         setContentView(R.layout.activity_login);
@@ -44,7 +43,6 @@ public class LoginActivity extends AppCompatActivity {
         mPasswordView = (EditText) findViewById(R.id.password);
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
 
-        mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mRegister = findViewById(R.id.RegisterTextView);
 
@@ -86,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, "Incorrect Login!", Toast.LENGTH_LONG).show();
                             }
                         } else {
-                            //Intent intent = new Intent(LoginActivity.this, //Main Activity)
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 
                             finish();
                         }
