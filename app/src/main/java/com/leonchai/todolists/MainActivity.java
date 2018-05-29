@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
 
-        final FirebaseUser user = auth.getCurrentUser();
+        user = auth.getCurrentUser();
 
         if(user != null){
             if(user.getDisplayName() == null || user.getDisplayName().isEmpty()) {
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
+        FirebaseDB.createUserTable(user.getUid());
+
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         System.out.println(user.getDisplayName());
+
     }
 
     @Override
@@ -77,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new DoneFragment(), "DONE");
         viewPager.setAdapter(adapter);
     }
+
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();

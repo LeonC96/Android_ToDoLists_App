@@ -70,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+                mProgressView.bringToFront();
                 mProgressView.setVisibility(View.VISIBLE);
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
