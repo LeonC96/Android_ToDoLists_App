@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -45,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            System.out.println("User profile updated");
-                            System.out.println(user.getDisplayName());
+                            Log.i(MainActivity.class.getName(),"User profile updated");
                         }
                     }
                 });
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        FirebaseDB.createUserTable(user.getUid());
+        FirebaseDB.createUserTable(user.getUid(), user.getDisplayName(), user.getEmail());
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        System.out.println(user.getDisplayName());
-
+        //System.out.println(user.getDisplayName());
+        FirebaseDB.getDoList(user.getUid());
     }
 
     @Override
