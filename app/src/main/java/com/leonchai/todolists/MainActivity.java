@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        //tabLayout.setTabTextColors(Color.parseColor("#FFF"), Color.parseColor("#F00"));
 
         //System.out.println(user.getDisplayName());
         FirebaseDB.getDoList(user.getUid());
