@@ -98,6 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
+                android:textAllCaps="false"
                 android:textStyle="bold"
                 android:background="@color/btnBlue"
                 android:textColor="@color/white"/>
@@ -112,6 +113,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="27dp"
             app:srcCompat="@drawable/logo"/>
+
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -65,15 +65,23 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseDB.createUserTable(user.getUid(), user.getDisplayName(), user.getEmail());
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
-
         tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        //tabLayout.setTabTextColors(Color.parseColor("#FFF"), Color.parseColor("#F00"));
 
-        //System.out.println(user.getDisplayName());
-        FirebaseDB.getDoList(user.getUid());
+        //tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_text_1));
+        //tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_text_2));
+        //tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_text_3));
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        //adding fragments
+        adapter.AddFragment(new DoFragment(), "DO");
+        adapter.AddFragment(new DoingFragment(), "TEST");
+        adapter.AddFragment(new DoneFragment(), "DONE");
+
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -105,42 +113,38 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupViewPager(ViewPager viewPager){
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new DoFragment(), "DO");
-        adapter.addFragment(new DoingFragment(), "DOING");
-        adapter.addFragment(new DoneFragment(), "DONE");
-        viewPager.setAdapter(adapter);
-    }
 
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
+        private final List<Fragment> fragmentList = new ArrayList<>();
+        private final List<String> fragmentListTitles = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+
         }
 
         @Override
         public Fragment getItem(int position) {
-            return mFragmentList.get(position);
+            return fragmentList.get(position);
         }
 
         @Override
         public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
+            return fragmentListTitles.size();
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
+        public CharSequence getPageTitle(int position){
+            return fragmentListTitles.get(position);
         }
+
+        public void AddFragment(Fragment fragment, String title){
+            fragmentList.add(fragment);
+            fragmentListTitles.add(title);
+        }
+
     }
 }
 

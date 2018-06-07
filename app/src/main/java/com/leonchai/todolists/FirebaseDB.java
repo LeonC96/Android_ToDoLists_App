@@ -37,7 +37,7 @@ public class FirebaseDB {
 
     }
 
-    public static void getDoList(String userID){
+    public static void getDoList(String userID, String tableName){
         DB.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
