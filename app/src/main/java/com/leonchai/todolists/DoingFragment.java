@@ -42,7 +42,7 @@ public class DoingFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_do, container, false);
 
-        System.out.println("onCreateView");
+        System.out.println("Doing onCreateView");
 
         doingList = (ListView) view.findViewById(R.id.doListView);
 
@@ -71,7 +71,7 @@ public class DoingFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("RESUME");
+        System.out.println("Doing RESUME");
     }
 
     @Override
