@@ -67,16 +67,14 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        //tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_text_1));
-        //tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_text_2));
-        //tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_text_3));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
         //adding fragments
         adapter.AddFragment(new DoFragment(), "DO");
-        adapter.AddFragment(new DoingFragment(), "TEST");
+        adapter.AddFragment(new DoingFragment(), "DOING");
         adapter.AddFragment(new DoneFragment(), "DONE");
 
         viewPager.setOffscreenPageLimit(2);

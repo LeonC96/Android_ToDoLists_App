@@ -1,18 +1,18 @@
 package com.leonchai.todolists;
 
-public class DataModel {
+public class TaskModel {
     private String name;
     private String dueDate;
     private String user;
 
-    public DataModel(String name, String dueDate){
+    public TaskModel(String name, String dueDate){
         this.name = name;
         this.dueDate = dueDate;
         user = "";
 
     }
 
-    public DataModel(String name, String dueDate, String user){
+    public TaskModel(String name, String dueDate, String user){
         this.name = name;
         this.dueDate = dueDate;
         this.user = user;

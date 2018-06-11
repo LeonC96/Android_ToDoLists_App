@@ -6,7 +6,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FirebaseDB {
     private static final DatabaseReference DB = FirebaseDatabase.getInstance().getReference();
@@ -37,11 +39,23 @@ public class FirebaseDB {
 
     }
 
-    public static void getDoList(String userID, String tableName){
-        DB.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+    public static void getList(String userID, String tableName, final FirebaseCallback callback){
+
+        DB.child(userID).child(tableName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //System.out.println(dataSnapshot.getValue().toString());
+                TaskModel newTask;
+                List<TaskModel> tasklist = new ArrayList<>();
+
+                for(DataSnapshot task : dataSnapshot.getChildren()){
+                    String name = (String) task.child("name").getValue();
+                    String dueDate = (String) task.child("dueDate").getValue();
+                    newTask = new TaskModel(name, dueDate);
+                    tasklist.add(newTask);
+                }
+
+                callback.onCallback(tasklist);
+
             }
 
             @Override
@@ -51,4 +65,9 @@ public class FirebaseDB {
         });
     }
 
+
+    public interface FirebaseCallback{
+        void onCallback(List<TaskModel> tasks);
+    }
 }
+

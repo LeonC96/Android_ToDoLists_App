@@ -12,11 +12,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskAdapter extends ArrayAdapter<DataModel> {
+public class TaskAdapter extends ArrayAdapter<TaskModel> {
     private Context context;
-    private List<DataModel> taskList;
+    private List<TaskModel> taskList;
 
-    public TaskAdapter(Context context, ArrayList<DataModel> list){
+    public TaskAdapter(Context context, ArrayList<TaskModel> list){
         super(context, 0, list);
         this.context = context;
         this.taskList = list;
@@ -28,7 +28,7 @@ public class TaskAdapter extends ArrayAdapter<DataModel> {
         if(listItem == null)
             listItem = LayoutInflater.from(getContext()).inflate(R.layout.row_item,parent,false);
 
-        DataModel currentTask = taskList.get(position);
+        TaskModel currentTask = taskList.get(position);
 
         TextView name = (TextView) listItem.findViewById(R.id.textViewName);
         name.setText(currentTask.getName());
