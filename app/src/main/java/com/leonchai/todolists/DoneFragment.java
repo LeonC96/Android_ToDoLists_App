@@ -79,13 +79,11 @@ public class DoneFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
-            System.out.println("VISIBLE");
             if(getView() != null){
-                System.out.println("THERES A VIEW");
                 isViewShown = true;
             }
         } else {
-            System.out.println("NOT VISIBLE");
+
         }
     }
 
@@ -95,8 +93,7 @@ public class DoneFragment extends Fragment {
         FirebaseDB.getList(user.getUid(), "doTasks", new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
-                System.out.println(tasks.get(0).getName());
-                System.out.println("DONE");
+                //System.out.println(tasks.get(0).getName());
             }
         });
     }

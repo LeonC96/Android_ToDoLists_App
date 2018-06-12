@@ -18,7 +18,7 @@ import java.util.List;
 
 public class DoFragment extends Fragment {
 
-    private ListView doList;
+    private ListView doListView;
 
     private TaskAdapter taskAdapter;
     private SwipeActionAdapter swipeAdapter;
@@ -26,6 +26,7 @@ public class DoFragment extends Fragment {
     private FirebaseAuth auth;
     private FirebaseUser user;
 
+    private ArrayList<TaskModel> tasksList = new ArrayList<>();
     private boolean isViewShown = false;
 
     public DoFragment() {
@@ -48,29 +49,16 @@ public class DoFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_do, container, false);
 
-        System.out.println("onCreateView");
+        System.out.println("Do onCreateView");
 
-        doList = (ListView) view.findViewById(R.id.doListView);
+        doListView = (ListView) view.findViewById(R.id.doListView);
 
-
-        final ArrayList<TaskModel> tasks = new ArrayList<>();
-        tasks.add(new TaskModel("Do this", "01/20/19", user.getDisplayName()));
-        tasks.add(new TaskModel("Do that", "06/20/19", user.getDisplayName()));
-        tasks.add(new TaskModel("Do this", "01/20/29", user.getDisplayName()));
-        tasks.add(new TaskModel("Do and this", "01/24/19", user.getDisplayName()));
-        tasks.add(new TaskModel("Do this", "01/20/18", user.getDisplayName()));
-        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-
-        taskAdapter = new TaskAdapter(getActivity(),tasks);
+        taskAdapter = new TaskAdapter(getActivity(),tasksList);
 
         swipeAdapter = new SwipeActionAdapter(taskAdapter);
-        swipeAdapter.setListView(doList);
+        swipeAdapter.setListView(doListView);
 
-        doList.setAdapter(swipeAdapter);
+        doListView.setAdapter(swipeAdapter);
 
         // Add Left swipe
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.delete_bg);
@@ -102,23 +90,37 @@ public class DoFragment extends Fragment {
 
             @Override
             public void onSwipe(int[] position, SwipeDirection[] direction) {
-                for(int i = 0; i < position.length; i++){
+                for(int i = 0; i < position.length; i++) {
                     SwipeDirection currentDirection = direction[i];
                     int currentPosition = position[i];
 
-                    switch (currentDirection){
+                    switch (currentDirection) {
                         case DIRECTION_FAR_LEFT:
-                            Toast.makeText(getContext(), "Swipe LEFT", Toast.LENGTH_SHORT).show();
+                            // Delete
+                            tasksList.remove(currentPosition);
+                            swipeAdapter.notifyDataSetChanged();
                             break;
                         case DIRECTION_FAR_RIGHT:
+                            // Move to Doing
                             Toast.makeText(getContext(), "Swipe Right", Toast.LENGTH_SHORT).show();
                             break;
                     }
-
-                    swipeAdapter.notifyDataSetChanged();
                 }
             }
         });
+
+        tasksList.add(new TaskModel("Do this", "01/20/19", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do that", "06/20/19", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do this", "01/20/29", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do and this", "01/24/19", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do this", "01/20/18", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+
+        swipeAdapter.notifyDataSetChanged();
 
 
         /*
@@ -126,10 +128,11 @@ public class DoFragment extends Fragment {
         * one time here.
         */
         if(!isViewShown){
-
+            System.out.println("Called fetchData()");
+            fetchData();
+            System.out.println("finished fetchData()");
         }
 
-        fetchData();
         return view;
     }
 
@@ -160,8 +163,12 @@ public class DoFragment extends Fragment {
         FirebaseDB.getList(user.getUid(), "doTasks", new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
-                System.out.println(tasks.get(0).getName());
-                System.out.println("DONE");
+                for(TaskModel task : tasks){
+                    tasks.add(task);
+                }
+                System.out.println("Fetched data");
+                swipeAdapter.notifyDataSetChanged();
+
             }
         });
     }
