@@ -16,6 +16,7 @@ import java.util.List;
 public class DoFragment extends Fragment {
 
     private ListView doList;
+
     private TaskAdapter adapter;
 
     private FirebaseAuth auth;
@@ -47,16 +48,22 @@ public class DoFragment extends Fragment {
 
         doList = (ListView) view.findViewById(R.id.doListView);
 
-        ArrayList<TaskModel> tasks = new ArrayList<>();
+
+        final ArrayList<TaskModel> tasks = new ArrayList<>();
         tasks.add(new TaskModel("Do this", "01/20/19", user.getDisplayName()));
         tasks.add(new TaskModel("Do that", "06/20/19", user.getDisplayName()));
         tasks.add(new TaskModel("Do this", "01/20/29", user.getDisplayName()));
         tasks.add(new TaskModel("Do and this", "01/24/19", user.getDisplayName()));
         tasks.add(new TaskModel("Do this", "01/20/18", user.getDisplayName()));
         tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
+        tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
 
         adapter = new TaskAdapter(getActivity(),tasks);
         doList.setAdapter(adapter);
+
 
         /*
         * First time app opens, setUserVisibleHint() runs first so getting data must be called
