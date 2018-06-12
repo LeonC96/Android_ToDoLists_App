@@ -6,9 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
+import com.wdullaer.swipeactionadapter.SwipeDirection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +20,8 @@ public class DoFragment extends Fragment {
 
     private ListView doList;
 
-    private TaskAdapter adapter;
+    private TaskAdapter taskAdapter;
+    private SwipeActionAdapter swipeAdapter;
 
     private FirebaseAuth auth;
     private FirebaseUser user;
@@ -61,8 +65,60 @@ public class DoFragment extends Fragment {
         tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
         tasks.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
 
-        adapter = new TaskAdapter(getActivity(),tasks);
-        doList.setAdapter(adapter);
+        taskAdapter = new TaskAdapter(getActivity(),tasks);
+
+        swipeAdapter = new SwipeActionAdapter(taskAdapter);
+        swipeAdapter.setListView(doList);
+
+        doList.setAdapter(swipeAdapter);
+
+        // Add Left swipe
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.delete_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.delete_bg);
+
+        //Add Right swipe
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.in_progress_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT, R.layout.in_progress_bg);
+
+        // Disable short swipes incase of accidents
+        swipeAdapter.setNormalSwipeFraction(1);
+
+        // What each swipe action does
+        // Swipe Right: in_progress_bg
+        // Swipe Left: Delete
+        swipeAdapter.setSwipeActionListener(new SwipeActionAdapter.SwipeActionListener() {
+            @Override
+            public boolean hasActions(int position, SwipeDirection direction) {
+                if(direction.isLeft()) return true; // Change this to false to disable left swipes
+                if(direction.isRight()) return true;
+
+                return false;
+            }
+
+            @Override
+            public boolean shouldDismiss(int position, SwipeDirection direction) {
+                return false;
+            }
+
+            @Override
+            public void onSwipe(int[] position, SwipeDirection[] direction) {
+                for(int i = 0; i < position.length; i++){
+                    SwipeDirection currentDirection = direction[i];
+                    int currentPosition = position[i];
+
+                    switch (currentDirection){
+                        case DIRECTION_FAR_LEFT:
+                            Toast.makeText(getContext(), "Swipe LEFT", Toast.LENGTH_SHORT).show();
+                            break;
+                        case DIRECTION_FAR_RIGHT:
+                            Toast.makeText(getContext(), "Swipe Right", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+
+                    swipeAdapter.notifyDataSetChanged();
+                }
+            }
+        });
 
 
         /*

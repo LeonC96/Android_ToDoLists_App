@@ -31,6 +31,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 
+    compile 'com.wdullaer:swipeactionadapter:2.0.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
