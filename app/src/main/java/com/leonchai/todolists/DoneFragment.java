@@ -21,6 +21,8 @@ public class DoneFragment extends Fragment {
     private FirebaseAuth auth;
     private FirebaseUser user;
 
+    private boolean isViewShown;
+
     public DoneFragment() {
         // Required empty public constructor
     }
@@ -54,14 +56,15 @@ public class DoneFragment extends Fragment {
         adapter = new TaskAdapter(getActivity(),tasks);
         doneList.setAdapter(adapter);
 
-        //STILL NEEDS TO WAIT .... maybe dont matter
-        FirebaseDB.getList(user.getUid(), "doTasks", new FirebaseDB.FirebaseCallback() {
-            @Override
-            public void onCallback(List<TaskModel> tasks) {
-                System.out.println(tasks.get(0).getName());
-                System.out.println("DONE");
-            }
-        });
+        /*
+         * First time app opens, setUserVisibleHint() runs first so getting data must be called
+         * one time here.
+         */
+        if(!isViewShown){
+
+        }
+
+        fetchData();
         return view;
     }
 
@@ -71,6 +74,7 @@ public class DoneFragment extends Fragment {
         System.out.println("Done RESUME");
     }
 
+    // Used to update list every time user goes back to fragment
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -78,10 +82,23 @@ public class DoneFragment extends Fragment {
             System.out.println("VISIBLE");
             if(getView() != null){
                 System.out.println("THERES A VIEW");
+                isViewShown = true;
             }
         } else {
             System.out.println("NOT VISIBLE");
         }
+    }
+
+    // fetches Firebse DB data
+    private void fetchData(){
+        //STILL NEEDS TO WAIT .... maybe dont matter
+        FirebaseDB.getList(user.getUid(), "doTasks", new FirebaseDB.FirebaseCallback() {
+            @Override
+            public void onCallback(List<TaskModel> tasks) {
+                System.out.println(tasks.get(0).getName());
+                System.out.println("DONE");
+            }
+        });
     }
 
 }
