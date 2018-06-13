@@ -33,8 +33,6 @@ public class DoingFragment extends Fragment {
         // Required empty public constructor
     }
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +56,7 @@ public class DoingFragment extends Fragment {
 
         doingListView.setAdapter(swipeAdapter);
 
+        //TODO: do layout
         // Add Left swipe
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.delete_bg);
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.delete_bg);
@@ -100,7 +99,7 @@ public class DoingFragment extends Fragment {
                             break;
                         case DIRECTION_FAR_RIGHT:
                             // Move to Done Fragment
-                            
+
                             break;
                     }
                 }
