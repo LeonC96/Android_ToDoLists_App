@@ -109,20 +109,6 @@ public class DoFragment extends Fragment {
             }
         });
 
-        tasksList.add(new TaskModel("Do this", "01/20/19", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do that", "06/20/19", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do this", "01/20/29", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do and this", "01/24/19", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do this", "01/20/18", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-        tasksList.add(new TaskModel("Do this", "01/06/19", user.getDisplayName()));
-
-        swipeAdapter.notifyDataSetChanged();
-
-
         /*
         * First time app opens, setUserVisibleHint() runs first so getting data must be called
         * one time here.
@@ -159,13 +145,10 @@ public class DoFragment extends Fragment {
 
     // fetches Firebse DB data
     private void fetchData(){
-        //STILL NEEDS TO WAIT .... maybe dont matter
         FirebaseDB.getList(user.getUid(), "doTasks", new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
-                for(TaskModel task : tasks){
-                    tasks.add(task);
-                }
+                tasksList.addAll(tasks);
                 System.out.println("Fetched data");
                 swipeAdapter.notifyDataSetChanged();
 
