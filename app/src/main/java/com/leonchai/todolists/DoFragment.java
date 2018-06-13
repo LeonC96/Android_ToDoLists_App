@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,6 +26,8 @@ public class DoFragment extends Fragment {
     private FirebaseUser user;
 
     private ArrayList<TaskModel> tasksList = new ArrayList<>();
+
+    // Used to check for first time loading app
     private boolean isViewShown = false;
 
     public DoFragment() {
@@ -37,7 +38,6 @@ public class DoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        System.out.println("onCreate");
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
@@ -48,8 +48,6 @@ public class DoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_do, container, false);
-
-        System.out.println("Do onCreateView");
 
         doListView = (ListView) view.findViewById(R.id.doListView);
 
@@ -102,7 +100,7 @@ public class DoFragment extends Fragment {
                             break;
                         case DIRECTION_FAR_RIGHT:
                             // Move to Doing
-                            Toast.makeText(getContext(), "Swipe Right", Toast.LENGTH_SHORT).show();
+
                             break;
                     }
                 }
@@ -114,9 +112,7 @@ public class DoFragment extends Fragment {
         * one time here.
         */
         if(!isViewShown){
-            System.out.println("Called fetchData()");
             fetchData();
-            System.out.println("finished fetchData()");
         }
 
         return view;
@@ -125,7 +121,6 @@ public class DoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("RESUME");
     }
 
     // Used to update list every time user goes back to fragment
@@ -133,13 +128,10 @@ public class DoFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
-            System.out.println("VISIBLE");
             if(getView() != null){
-                System.out.println("THERES A VIEW");
+                fetchData();
                 isViewShown = true;
             }
-        } else {
-            System.out.println("NOT VISIBLE");
         }
     }
 
@@ -148,9 +140,13 @@ public class DoFragment extends Fragment {
         FirebaseDB.getList(user.getUid(), "doTasks", new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
-                tasksList.addAll(tasks);
-                System.out.println("Fetched data");
-                swipeAdapter.notifyDataSetChanged();
+                // Check if there is any data to fetch
+                if(!tasks.isEmpty() && tasks != null) {
+                    tasksList.clear();
+                    tasksList.addAll(tasks);
+                    swipeAdapter.notifyDataSetChanged();
+                }
+
 
             }
         });
