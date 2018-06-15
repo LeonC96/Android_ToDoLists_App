@@ -51,7 +51,8 @@ public class FirebaseDB {
                 for(DataSnapshot task : dataSnapshot.getChildren()){
                     String name = (String) task.child("name").getValue();
                     String dueDate = (String) task.child("dueDate").getValue();
-                    newTask = new TaskModel(task.getKey(), name, dueDate);
+                    String user = (String) task.child("user").getValue();
+                    newTask = new TaskModel(task.getKey(), name, dueDate, user);
                     tasklist.add(newTask);
                 }
 
@@ -66,9 +67,14 @@ public class FirebaseDB {
         });
     }
 
-    //TODO: TEST
     public static void addTask(String userID, String tableName, TaskModel task){
-        String taskKey = DB.child(userID).child(tableName).push().getKey();
+        String taskKey;
+
+        if(task.getId().equals("") || task.getId() == null) {
+            taskKey = DB.child(userID).child(tableName).push().getKey();
+        } else {
+            taskKey = task.getId();
+        }
 
         Map<String, Object> firebaseTask = new HashMap<>();
         firebaseTask.put("name", task.getName());
@@ -76,6 +82,10 @@ public class FirebaseDB {
         firebaseTask.put("user", task.getUser());
 
         DB.child(userID).child(tableName).child(taskKey).updateChildren(firebaseTask);
+    }
+
+    public static void removeTask(String userID, String tableName, TaskModel task){
+        DB.child(userID).child(tableName).child(task.getId()).removeValue();
     }
 
 

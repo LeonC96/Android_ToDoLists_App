@@ -17,7 +17,7 @@ import java.util.List;
 
 public class DoFragment extends Fragment {
 
-    private static final String TABLE_NAME = "doTasks";
+    public static final String TABLE_NAME = "doTasks";
 
     private ListView doListView;
 
@@ -61,8 +61,8 @@ public class DoFragment extends Fragment {
         doListView.setAdapter(swipeAdapter);
 
         // Add Left swipe
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.delete_bg);
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.delete_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.delete_do_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.delete_do_bg);
 
         //Add Right swipe
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.in_progress_bg);
@@ -93,16 +93,24 @@ public class DoFragment extends Fragment {
                 for(int i = 0; i < position.length; i++) {
                     SwipeDirection currentDirection = direction[i];
                     int currentPosition = position[i];
+                    TaskModel currentTask = tasksList.get(currentPosition);
 
                     switch (currentDirection) {
                         case DIRECTION_FAR_LEFT:
                             // Delete
                             tasksList.remove(currentPosition);
+                            FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
                             swipeAdapter.notifyDataSetChanged();
                             break;
                         case DIRECTION_FAR_RIGHT:
-                            TaskModel currentTask = tasksList.get(currentPosition);
 
+                            // Add task to doing fragment list
+                            FirebaseDB.addTask(user.getUid(), DoingFragment.TABLE_NAME,currentTask);
+
+                            // Removes task from list and from firebase
+                            tasksList.remove(currentPosition);
+                            FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
+                            swipeAdapter.notifyDataSetChanged();
                             break;
                     }
                 }

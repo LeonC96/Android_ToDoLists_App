@@ -6,6 +6,14 @@ public class TaskModel {
     private String user;
     private String id;
 
+    public TaskModel(String name, String dueDate){
+        this.id = "";
+        this.name = name;
+        this.dueDate = dueDate;
+        user = "";
+
+    }
+
     public TaskModel(String id, String name, String dueDate){
         this.id = id;
         this.name = name;

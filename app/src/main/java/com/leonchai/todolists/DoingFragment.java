@@ -18,7 +18,7 @@ import java.util.List;
 
 public class DoingFragment extends Fragment {
 
-    private static final String TABLE_NAME = "doingTasks";
+    public static final String TABLE_NAME = "doingTasks";
 
     private ListView doingListView;
 
@@ -58,7 +58,6 @@ public class DoingFragment extends Fragment {
 
         doingListView.setAdapter(swipeAdapter);
 
-        //TODO: do layout
         // Add Left swipe
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.unassigned_bg);
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.unassigned_bg);
@@ -92,16 +91,28 @@ public class DoingFragment extends Fragment {
                 for(int i = 0; i < position.length; i++) {
                     SwipeDirection currentDirection = direction[i];
                     int currentPosition = position[i];
+                    TaskModel currentTask = tasksList.get(currentPosition);
 
                     switch (currentDirection) {
+                        // Move back to do fragment
                         case DIRECTION_FAR_LEFT:
-                            // Delete
+
+                            // Add task to do fragment list
+                            FirebaseDB.addTask(user.getUid(), DoFragment.TABLE_NAME,currentTask);
+
                             tasksList.remove(currentPosition);
+                            FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
                             swipeAdapter.notifyDataSetChanged();
                             break;
-                        case DIRECTION_FAR_RIGHT:
-                            // Move to Done Fragment
 
+                        // Move to Done Fragment
+                        case DIRECTION_FAR_RIGHT:
+                            // Add task to done fragment list
+                            FirebaseDB.addTask(user.getUid(), DoneFragment.TABLE_NAME,currentTask);
+
+                            tasksList.remove(currentPosition);
+                            FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
+                            swipeAdapter.notifyDataSetChanged();
                             break;
                     }
                 }
@@ -143,7 +154,7 @@ public class DoingFragment extends Fragment {
             public void onCallback(List<TaskModel> tasks) {
                 // Check if there is any data to fetch
                 if(!tasks.isEmpty() && tasks != null) {
-                    tasks.clear();
+                    tasksList.clear();
                     tasksList.addAll(tasks);
                     swipeAdapter.notifyDataSetChanged();
                 }

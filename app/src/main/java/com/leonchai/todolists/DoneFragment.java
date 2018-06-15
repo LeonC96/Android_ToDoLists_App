@@ -17,7 +17,7 @@ import java.util.List;
 
 public class DoneFragment extends Fragment {
 
-    private static final String TABLE_NAME = "doneTasks";
+    public static final String TABLE_NAME = "doneTasks";
 
     private ListView doneListView;
 
@@ -57,15 +57,14 @@ public class DoneFragment extends Fragment {
 
         doneListView.setAdapter(swipeAdapter);
 
-        //TODO: test
         // Add Left swipe
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.incomplete_bg);
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.incomplete_bg);
 
 
         //Add Right swipe
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.delete_bg);
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT, R.layout.delete_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.delete_done_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT, R.layout.delete_done_bg);
 
         // Disable short swipes incase of accidents
         swipeAdapter.setNormalSwipeFraction(1);
@@ -92,16 +91,24 @@ public class DoneFragment extends Fragment {
                 for(int i = 0; i < position.length; i++) {
                     SwipeDirection currentDirection = direction[i];
                     int currentPosition = position[i];
+                    TaskModel currentTask = tasksList.get(currentPosition);
 
                     switch (currentDirection) {
                         case DIRECTION_FAR_LEFT:
-                            // Delete
+                            // Move to Done Fragment
+                            // Add task to doing fragment list
+                            FirebaseDB.addTask(user.getUid(), DoingFragment.TABLE_NAME,currentTask);
+
+                            // Removes task from list and from firebase
                             tasksList.remove(currentPosition);
+                            FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
                             swipeAdapter.notifyDataSetChanged();
                             break;
                         case DIRECTION_FAR_RIGHT:
-                            // Move to Done Fragment
-
+                            // Delete
+                            tasksList.remove(currentPosition);
+                            FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
+                            swipeAdapter.notifyDataSetChanged();
                             break;
                     }
                 }
@@ -140,13 +147,12 @@ public class DoneFragment extends Fragment {
 
     // fetches Firebse DB data
     private void fetchData(){
-        //STILL NEEDS TO WAIT .... maybe dont matter
         FirebaseDB.getList(user.getUid(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
                 // Check if there is any data to fetch
                 if(!tasks.isEmpty() && tasks != null) {
-                    tasks.clear();
+                    tasksList.clear();
                     tasksList.addAll(tasks);
                     swipeAdapter.notifyDataSetChanged();
                 }
