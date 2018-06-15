@@ -17,6 +17,8 @@ import java.util.List;
 
 public class DoFragment extends Fragment {
 
+    private static final String TABLE_NAME = "doTasks";
+
     private ListView doListView;
 
     private TaskAdapter taskAdapter;
@@ -99,7 +101,7 @@ public class DoFragment extends Fragment {
                             swipeAdapter.notifyDataSetChanged();
                             break;
                         case DIRECTION_FAR_RIGHT:
-                            // Move to Doing
+                            TaskModel currentTask = tasksList.get(currentPosition);
 
                             break;
                     }
@@ -137,7 +139,7 @@ public class DoFragment extends Fragment {
 
     // fetches Firebse DB data
     private void fetchData(){
-        FirebaseDB.getList(user.getUid(), "doTasks", new FirebaseDB.FirebaseCallback() {
+        FirebaseDB.getList(user.getUid(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
                 // Check if there is any data to fetch

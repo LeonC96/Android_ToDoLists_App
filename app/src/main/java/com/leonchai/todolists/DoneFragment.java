@@ -17,6 +17,8 @@ import java.util.List;
 
 public class DoneFragment extends Fragment {
 
+    private static final String TABLE_NAME = "doneTasks";
+
     private ListView doneListView;
 
     private TaskAdapter taskAdapter;
@@ -55,15 +57,15 @@ public class DoneFragment extends Fragment {
 
         doneListView.setAdapter(swipeAdapter);
 
-
+        //TODO: test
         // Add Left swipe
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.delete_bg);
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.delete_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.incomplete_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.incomplete_bg);
 
-        //TODO: incomplete layout
+
         //Add Right swipe
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.done_bg);
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT, R.layout.done_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.delete_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT, R.layout.delete_bg);
 
         // Disable short swipes incase of accidents
         swipeAdapter.setNormalSwipeFraction(1);
@@ -128,6 +130,7 @@ public class DoneFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
             if(getView() != null){
+                fetchData();
                 isViewShown = true;
             }
         } else {
@@ -138,7 +141,7 @@ public class DoneFragment extends Fragment {
     // fetches Firebse DB data
     private void fetchData(){
         //STILL NEEDS TO WAIT .... maybe dont matter
-        FirebaseDB.getList(user.getUid(), "doneTasks", new FirebaseDB.FirebaseCallback() {
+        FirebaseDB.getList(user.getUid(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
                 // Check if there is any data to fetch

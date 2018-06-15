@@ -18,6 +18,8 @@ import java.util.List;
 
 public class DoingFragment extends Fragment {
 
+    private static final String TABLE_NAME = "doingTasks";
+
     private ListView doingListView;
 
     private TaskAdapter taskAdapter;
@@ -58,8 +60,8 @@ public class DoingFragment extends Fragment {
 
         //TODO: do layout
         // Add Left swipe
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.delete_bg);
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.delete_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.unassigned_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.unassigned_bg);
 
         //Add Right swipe
         swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.done_bg);
@@ -136,7 +138,7 @@ public class DoingFragment extends Fragment {
 
     // fetches Firebse DB data
     private void fetchData(){
-        FirebaseDB.getList(user.getUid(), "doingTasks", new FirebaseDB.FirebaseCallback() {
+        FirebaseDB.getList(user.getUid(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
                 // Check if there is any data to fetch

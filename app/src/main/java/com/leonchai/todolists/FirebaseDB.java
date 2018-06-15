@@ -9,6 +9,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FirebaseDB {
     private static final DatabaseReference DB = FirebaseDatabase.getInstance().getReference();
@@ -50,7 +51,7 @@ public class FirebaseDB {
                 for(DataSnapshot task : dataSnapshot.getChildren()){
                     String name = (String) task.child("name").getValue();
                     String dueDate = (String) task.child("dueDate").getValue();
-                    newTask = new TaskModel(name, dueDate);
+                    newTask = new TaskModel(task.getKey(), name, dueDate);
                     tasklist.add(newTask);
                 }
 
@@ -63,6 +64,18 @@ public class FirebaseDB {
 
             }
         });
+    }
+
+    //TODO: TEST
+    public static void addTask(String userID, String tableName, TaskModel task){
+        String taskKey = DB.child(userID).child(tableName).push().getKey();
+
+        Map<String, Object> firebaseTask = new HashMap<>();
+        firebaseTask.put("name", task.getName());
+        firebaseTask.put("dueDate", task.getDueDate());
+        firebaseTask.put("user", task.getUser());
+
+        DB.child(userID).child(tableName).child(taskKey).updateChildren(firebaseTask);
     }
 
 
