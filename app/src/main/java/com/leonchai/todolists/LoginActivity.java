@@ -81,11 +81,9 @@ public class LoginActivity extends AppCompatActivity {
 
                         //if there was an error
                         if(!task.isSuccessful()){
-                            if(password.length() < 6) {
-                                mPasswordView.setError(getString(R.string.error_invalid_password));
-                            } else {
-                                Toast.makeText(LoginActivity.this, "Incorrect Login!", Toast.LENGTH_LONG).show();
-                            }
+
+                            Toast.makeText(LoginActivity.this, "Incorrect Login!", Toast.LENGTH_LONG).show();
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         } else {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);

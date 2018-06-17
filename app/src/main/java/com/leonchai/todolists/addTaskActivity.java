@@ -16,7 +16,9 @@ public class addTaskActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_task);
 
         Toolbar toolbar = findViewById(R.id.toolBar);
+        toolbar.setTitle("New Task");
         setSupportActionBar(toolbar);
+
     }
 
     @Override
