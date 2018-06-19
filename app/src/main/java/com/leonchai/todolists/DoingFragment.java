@@ -25,11 +25,9 @@ public class DoingFragment extends Fragment {
     private TaskAdapter taskAdapter;
     private SwipeActionAdapter swipeAdapter;
 
-    private FirebaseAuth auth;
     private FirebaseUser user;
 
     private ArrayList<TaskModel> tasksList = new ArrayList<>();
-    private boolean isViewShown;
 
     public DoingFragment() {
         // Required empty public constructor
@@ -39,7 +37,7 @@ public class DoingFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
     }
@@ -136,7 +134,6 @@ public class DoingFragment extends Fragment {
         if(isVisibleToUser){
             if(getView() != null){
                 fetchData();
-                isViewShown = true;
             }
         }
     }

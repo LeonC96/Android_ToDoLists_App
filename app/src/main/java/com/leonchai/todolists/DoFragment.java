@@ -25,13 +25,9 @@ public class DoFragment extends Fragment {
     private TaskAdapter taskAdapter;
     private SwipeActionAdapter swipeAdapter;
 
-    private FirebaseAuth auth;
     private FirebaseUser user;
 
     private ArrayList<TaskModel> tasksList = new ArrayList<>();
-
-    // Used to check for first time loading app
-    private boolean isViewShown = false;
 
     public DoFragment() {
         // Required empty public constructor
@@ -41,7 +37,7 @@ public class DoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
     }
@@ -140,7 +136,6 @@ public class DoFragment extends Fragment {
             System.out.println("VISIBLE");
             if(getView() != null){
                 fetchData();
-                isViewShown = true;
             }
         }
     }
