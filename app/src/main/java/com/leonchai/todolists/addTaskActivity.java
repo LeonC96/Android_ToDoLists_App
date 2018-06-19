@@ -22,11 +22,6 @@ import java.util.Calendar;
 public class addTaskActivity extends AppCompatActivity {
 
     private FirebaseUser user;
-    private FirebaseAuth auth;
-
-    private String taskName;
-    private String dueDate;
-    private String description;
 
     private EditText nameEditText;
     private EditText descriptionEditText;
@@ -40,7 +35,7 @@ public class addTaskActivity extends AppCompatActivity {
         toolbar.setTitle("New Task");
         setSupportActionBar(toolbar);
 
-        auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
         nameEditText = (EditText) findViewById(R.id.nameEditText);
@@ -66,9 +61,10 @@ public class addTaskActivity extends AppCompatActivity {
                     Toast.makeText(this, "Must have a name & due date!", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                taskName = nameEditText.getText().toString();
-                description = descriptionEditText.getText().toString();
-                dueDate = dueDateTextView.getText().toString();
+
+                String taskName = nameEditText.getText().toString();
+                String description = descriptionEditText.getText().toString();
+                String dueDate = dueDateTextView.getText().toString();
 
                 TaskModel newTask = new TaskModel(taskName, dueDate, description);
                 FirebaseDB.addTask(user.getUid(), DoFragment.TABLE_NAME, newTask);

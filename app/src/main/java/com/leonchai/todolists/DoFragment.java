@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,7 +21,7 @@ public class DoFragment extends Fragment {
     public static final String TABLE_NAME = "doTasks";
 
     private ListView doListView;
-
+    private View view;
     private TaskAdapter taskAdapter;
     private SwipeActionAdapter swipeAdapter;
 
@@ -49,7 +50,7 @@ public class DoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_do, container, false);
+        view = inflater.inflate(R.layout.fragment_do, container, false);
 
         doListView = (ListView) view.findViewById(R.id.doListView);
 
@@ -149,13 +150,15 @@ public class DoFragment extends Fragment {
         FirebaseDB.getList(user.getUid(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
+                ProgressBar progressBar = view.findViewById(R.id.progressBar);
+                progressBar.setVisibility(View.VISIBLE);
                 // Check if there is any data to fetch
                 if(!tasks.isEmpty()) {
                     tasksList.clear();
                     tasksList.addAll(tasks);
                     swipeAdapter.notifyDataSetChanged();
                 }
-
+                progressBar.setVisibility(View.GONE);
 
             }
         });
