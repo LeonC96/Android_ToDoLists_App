@@ -105,6 +105,7 @@ public class DoFragment extends Fragment {
                         case DIRECTION_FAR_RIGHT:
 
                             // Add task to doing fragment list
+                            currentTask.setUser(user.getDisplayName());
                             FirebaseDB.addTask(user.getUid(), DoingFragment.TABLE_NAME,currentTask);
 
                             // Removes task from list and from firebase
@@ -117,13 +118,6 @@ public class DoFragment extends Fragment {
             }
         });
 
-        /*
-        * First time app opens, setUserVisibleHint() runs first so getting data must be called
-        * one time here.
-        */
-        if(!isViewShown){
-            fetchData();
-        }
 
         return view;
     }
@@ -131,6 +125,10 @@ public class DoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        System.out.println("RESUME");
+
+        fetchData();
+
     }
 
     // Used to update list every time user goes back to fragment
@@ -138,6 +136,7 @@ public class DoFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
+            System.out.println("VISIBLE");
             if(getView() != null){
                 fetchData();
                 isViewShown = true;
@@ -151,7 +150,7 @@ public class DoFragment extends Fragment {
             @Override
             public void onCallback(List<TaskModel> tasks) {
                 // Check if there is any data to fetch
-                if(!tasks.isEmpty() && tasks != null) {
+                if(!tasks.isEmpty()) {
                     tasksList.clear();
                     tasksList.addAll(tasks);
                     swipeAdapter.notifyDataSetChanged();

@@ -22,4 +22,85 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="61dp"
+        android:theme="@style/TextAppearence.App.TextInputLayout">
+
+        <EditText
+            android:id="@+id/nameEditText"
+            android:layout_width="264dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="19dp"
+            android:layout_marginTop="68dp"
+            android:backgroundTint="@color/white"
+            android:ems="10"
+            android:hint="Name"
+            android:inputType="textCapSentences|textPersonName"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="20sp"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="376dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="23dp"
+        android:theme="@style/TextAppearence.App.TextInputLayout">
+
+        <EditText
+            android:id="@+id/descriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="352dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="13dp"
+            android:backgroundTint="@color/white"
+            android:ems="10"
+            android:gravity="top|left"
+            android:hint="Description"
+            android:inputType="textMultiLine"
+            android:lines="8"
+            android:maxLines="15"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="20sp"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/dueDateButton"
+        android:layout_width="144dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="147dp"
+        android:background="@color/btnBlue"
+        android:text="@string/action_due_date"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/dueDateTextView"
+        android:layout_width="175dp"
+        android:layout_height="39dp"
+        android:layout_alignBottom="@+id/dueDateButton"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="30dp"
+        android:text=""
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
 </RelativeLayout>

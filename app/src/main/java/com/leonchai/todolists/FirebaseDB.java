@@ -80,6 +80,7 @@ public class FirebaseDB {
         firebaseTask.put("name", task.getName());
         firebaseTask.put("dueDate", task.getDueDate());
         firebaseTask.put("user", task.getUser());
+        firebaseTask.put("description", task.getDescription());
 
         DB.child(userID).child(tableName).child(taskKey).updateChildren(firebaseTask);
     }
