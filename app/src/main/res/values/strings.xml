@@ -20,4 +20,7 @@
     <string name="tab_text_3">Done</string>
     <string name="action_add">Add</string>
     <string name="action_due_date">Due Date</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>
