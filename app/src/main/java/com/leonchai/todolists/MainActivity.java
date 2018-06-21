@@ -3,7 +3,6 @@ package com.leonchai.todolists;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,7 +12,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> mAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
+    private String taskListID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerList = (ListView)findViewById(R.id.navList);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        mActivityTitle = getTitle().toString();
 
         addDrawerItems();
         setupDrawer();
@@ -63,28 +59,42 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         user = auth.getCurrentUser();
+        String name = getIntent().getStringExtra("name");
 
-        if(user != null){
-            if(user.getDisplayName() == null || user.getDisplayName().isEmpty()) {
-                String name = getIntent().getStringExtra("name");
-                UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                        .setDisplayName(name)
-                        .build();
-                user.updateProfile(profileUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.i(MainActivity.class.getName(),"User profile updated");
-                        }
-                    }
-                });
-            }
-        } else {
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            finish();
+        taskListID = getIntent().getStringExtra("taskListID");
+        if(taskListID == null){
+            taskListID = user.getUid();
+
         }
 
-        FirebaseDB.createUserTable(user.getUid(), user.getDisplayName(), user.getEmail());
+        // check if new user of existing
+        if(name != null) {
+            FirebaseDB.createUserTable(user.getUid(), name, user.getEmail(), new FirebaseDB.FirebaseCallback() {
+                @Override
+                public void onCallback(List<TaskModel> tasks) {
+
+                }
+
+                @Override
+                public void onCallbackListName(String listName) {
+                    mActivityTitle = listName;
+                    getSupportActionBar().setTitle(mActivityTitle);
+                }
+            });
+        } else {
+            FirebaseDB.getTaskListName(taskListID, new FirebaseDB.FirebaseCallback() {
+                @Override
+                public void onCallback(List<TaskModel> tasks) {
+
+                }
+
+                @Override
+                public void onCallbackListName(String listName) {
+                    mActivityTitle = listName;
+                    getSupportActionBar().setTitle(mActivityTitle);
+                }
+            });
+        }
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
@@ -94,13 +104,25 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         //adding fragments
-        adapter.AddFragment(new DoFragment(), "DO");
-        adapter.AddFragment(new DoingFragment(), "DOING");
-        adapter.AddFragment(new DoneFragment(), "DONE");
+        DoFragment doFragment = new DoFragment();
+        DoingFragment doingFragment = new DoingFragment();
+        DoneFragment doneFragment = new DoneFragment();
+        
+        //send task list ID to each fragment
+        Bundle bundle = new Bundle();
+        bundle.putString("taskListID", taskListID);
+        doFragment.setArguments(bundle);
+        doingFragment.setArguments(bundle);
+        doneFragment.setArguments(bundle);
+
+        adapter.AddFragment(doFragment, "DO");
+        adapter.AddFragment(doingFragment, "DOING");
+        adapter.AddFragment(doneFragment, "DONE");
 
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
     }
 
     @Override

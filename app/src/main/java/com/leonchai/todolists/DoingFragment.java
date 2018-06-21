@@ -150,6 +150,11 @@ public class DoingFragment extends Fragment {
                     swipeAdapter.notifyDataSetChanged();
                 }
             }
+
+            @Override
+            public void onCallbackListName(String listName) {
+
+            }
         });
     }
 

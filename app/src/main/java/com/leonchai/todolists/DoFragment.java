@@ -20,6 +20,8 @@ public class DoFragment extends Fragment {
 
     public static final String TABLE_NAME = "doTasks";
 
+    private String taskListID;
+
     private ListView doListView;
     private View view;
     private TaskAdapter taskAdapter;
@@ -47,6 +49,8 @@ public class DoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_do, container, false);
+
+        taskListID = getArguments().getString("taskListID");
 
         doListView = (ListView) view.findViewById(R.id.doListView);
 
@@ -154,6 +158,11 @@ public class DoFragment extends Fragment {
                     swipeAdapter.notifyDataSetChanged();
                 }
                 progressBar.setVisibility(View.GONE);
+
+            }
+
+            @Override
+            public void onCallbackListName(String listName) {
 
             }
         });
