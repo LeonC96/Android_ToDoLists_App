@@ -146,7 +146,7 @@ public class DoFragment extends Fragment {
 
     // fetches Firebse DB data
     private void fetchData(){
-        FirebaseDB.getList(user.getUid(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
+        FirebaseDB.getList(taskListID, TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
                 ProgressBar progressBar = view.findViewById(R.id.progressBar);

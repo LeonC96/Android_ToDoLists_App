@@ -21,6 +21,8 @@ public class DoneFragment extends Fragment {
 
     private ListView doneListView;
 
+    private String taskListID;
+
     private TaskAdapter taskAdapter;
     private SwipeActionAdapter swipeAdapter;
 
@@ -45,6 +47,8 @@ public class DoneFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_do, container, false);
+
+        taskListID = getArguments().getString("taskListID");
 
         doneListView = (ListView) view.findViewById(R.id.doListView);
 
@@ -135,7 +139,7 @@ public class DoneFragment extends Fragment {
 
     // fetches Firebse DB data
     private void fetchData(){
-        FirebaseDB.getList(user.getUid(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
+        FirebaseDB.getList(taskListID, TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(List<TaskModel> tasks) {
                 // Check if there is any data to fetch

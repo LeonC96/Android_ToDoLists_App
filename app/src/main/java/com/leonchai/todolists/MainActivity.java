@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         user = auth.getCurrentUser();
-        String name = getIntent().getStringExtra("name");
 
+        //check if just logged in or switch to different list
         taskListID = getIntent().getStringExtra("taskListID");
         if(taskListID == null){
             taskListID = user.getUid();
@@ -68,8 +68,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // check if new user of existing
-        if(name != null) {
-            FirebaseDB.createUserTable(user.getUid(), name, user.getEmail(), new FirebaseDB.FirebaseCallback() {
+        String username = getIntent().getStringExtra("username");
+        if(username != null) {
+            FirebaseDB.createUserTable(user.getUid(), username, user.getEmail(), new FirebaseDB.FirebaseCallback() {
                 @Override
                 public void onCallback(List<TaskModel> tasks) {
 
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         DoFragment doFragment = new DoFragment();
         DoingFragment doingFragment = new DoingFragment();
         DoneFragment doneFragment = new DoneFragment();
-        
+
         //send task list ID to each fragment
         Bundle bundle = new Bundle();
         bundle.putString("taskListID", taskListID);
