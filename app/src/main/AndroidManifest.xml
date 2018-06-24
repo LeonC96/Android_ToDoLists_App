@@ -29,6 +29,8 @@
         </activity>
         <activity android:name=".addTaskActivity">
         </activity>
+        <activity android:name=".TaskDetailActivity">
+        </activity>
     </application>
 
 </manifest>

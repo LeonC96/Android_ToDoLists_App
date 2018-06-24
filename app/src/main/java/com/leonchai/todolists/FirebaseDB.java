@@ -61,7 +61,9 @@ public class FirebaseDB {
                     String name = (String) task.child("name").getValue();
                     String dueDate = (String) task.child("dueDate").getValue();
                     String user = (String) task.child("user").getValue();
-                    newTask = new TaskModel(task.getKey(), name, dueDate, user);
+                    String description = (String) task.child("description").getValue();
+
+                    newTask = new TaskModel(task.getKey(), name, dueDate, user, description);
                     tasklist.add(newTask);
                 }
 
