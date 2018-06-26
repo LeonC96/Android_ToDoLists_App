@@ -1,6 +1,5 @@
 package com.leonchai.todolists;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -126,9 +125,7 @@ public class DoingFragment extends Fragment {
         doingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
-                intent.putExtra("task", tasksList.get(i));
-                startActivity(intent);
+
             }
         });
 
@@ -156,19 +153,16 @@ public class DoingFragment extends Fragment {
     private void fetchData(){
         FirebaseDB.getList(taskListID, TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
-            public void onCallback(List<TaskModel> tasks) {
+            public void onCallback(Object tasks) {
+                List<TaskModel> theTasks = (List<TaskModel>) tasks;
                 // Check if there is any data to fetch
-                if(!tasks.isEmpty()) {
+                if(!theTasks.isEmpty()) {
                     tasksList.clear();
-                    tasksList.addAll(tasks);
+                    tasksList.addAll(theTasks);
                     swipeAdapter.notifyDataSetChanged();
                 }
             }
 
-            @Override
-            public void onCallbackListName(String listName) {
-
-            }
         });
     }
 

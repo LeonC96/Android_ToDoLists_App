@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 public class FirebaseDB {
+
+    private static final String FIREBASE_USERS = "users";
+    private static final String FIREBASE_USER_PROJECTS = "projects";
+    private static final String FIREBASE_TASK_LIST_NAME = "taskListName";
+
     private static final DatabaseReference DB = FirebaseDatabase.getInstance().getReference();
 
 
@@ -20,7 +25,7 @@ public class FirebaseDB {
         final String userEmail = email;
         final String userName = name;
 
-        DB.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+        DB.child(FIREBASE_USERS).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(!dataSnapshot.hasChild(userID)){
@@ -28,16 +33,16 @@ public class FirebaseDB {
                     userDetail.put("email", userEmail);
                     userDetail.put("name", userName);
 
-                    DB.child("users").child(userID).setValue(userDetail);
+                    DB.child(FIREBASE_USERS).child(userID).setValue(userDetail);
 
                     HashMap<String, String> projectDetail = new HashMap<>();
-                    projectDetail.put("name", "Personal");
-                    projectDetail.put("users", name);
-                    DB.child("users").child(userID).child("projects").setValue(projectDetail);
+                    projectDetail.put(FIREBASE_TASK_LIST_NAME, "Personal");
+                    projectDetail.put(FIREBASE_USERS, name);
+                    DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).child(userID).setValue(projectDetail);
 
-                    DB.child(userID).child("taskListName").setValue("Personal");
+                    DB.child(userID).child(FIREBASE_TASK_LIST_NAME).setValue("Personal");
 
-                    callback.onCallbackListName("Personal");
+                    callback.onCallback("Personal");
                 }
             }
 
@@ -96,13 +101,27 @@ public class FirebaseDB {
         DB.child(listID).child(tableName).child(taskKey).updateChildren(firebaseTask);
     }
 
+    public static String createList(String userID, String listName){
+        // Create new list in Firebase
+        String listID = DB.push().getKey();
+        DB.child(listID).child(FIREBASE_TASK_LIST_NAME).setValue(listName);
+
+        // Add project list to user information in Firebase
+        Map<String, Object> newProject = new HashMap<>();
+        newProject.put(FIREBASE_TASK_LIST_NAME, listName);
+        newProject.put(FIREBASE_USERS, userID);
+        DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).child(listID).updateChildren(newProject);
+
+        return listID;
+    }
+
     public static void getTaskListName(String taskListID, final FirebaseCallback callback){
         DB.child(taskListID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String name = dataSnapshot.child("taskListName").getValue().toString();
+                String name = dataSnapshot.child(FIREBASE_TASK_LIST_NAME).getValue().toString();
 
-                callback.onCallbackListName(name);
+                callback.onCallback(name);
             }
 
             @Override
@@ -118,8 +137,8 @@ public class FirebaseDB {
 
 
     public interface FirebaseCallback{
-        void onCallback(List<TaskModel> tasks);
-        void onCallbackListName(String listName);
+        void onCallback(Object tasks);
+
     }
 }
 

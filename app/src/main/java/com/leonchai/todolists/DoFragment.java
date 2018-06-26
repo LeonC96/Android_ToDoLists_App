@@ -158,23 +158,21 @@ public class DoFragment extends Fragment {
     private void fetchData(){
         FirebaseDB.getList(taskListID, TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
-            public void onCallback(List<TaskModel> tasks) {
+            public void onCallback(Object tasks) {
                 ProgressBar progressBar = view.findViewById(R.id.progressBar);
                 progressBar.setVisibility(View.VISIBLE);
+
+                List<TaskModel> theTasks = (List<TaskModel>) tasks;
                 // Check if there is any data to fetch
-                if(!tasks.isEmpty()) {
+                if(!theTasks.isEmpty()) {
                     tasksList.clear();
-                    tasksList.addAll(tasks);
+                    tasksList.addAll(theTasks);
                     swipeAdapter.notifyDataSetChanged();
                 }
                 progressBar.setVisibility(View.GONE);
 
             }
 
-            @Override
-            public void onCallbackListName(String listName) {
-
-            }
         });
     }
 }

@@ -20,7 +20,6 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -40,11 +39,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
-    private ArrayAdapter<String> mAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
     private String taskListID;
-    private Button createListBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +58,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setHomeButtonEnabled(true);
 
         // Left side navigation view setup
-        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav);
+        mNavigationView = (NavigationView) findViewById(R.id.nav);
 
         if (mNavigationView != null) {
             mNavigationView.setNavigationItemSelectedListener(this);
         }
         mNavigationView.getMenu().getItem(0).setChecked(true);
+
         setupCreateListBtn();
 
         auth = FirebaseAuth.getInstance();
@@ -85,26 +83,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(username != null) {
             FirebaseDB.createUserTable(user.getUid(), username, user.getEmail(), new FirebaseDB.FirebaseCallback() {
                 @Override
-                public void onCallback(List<TaskModel> tasks) {
-
-                }
-
-                @Override
-                public void onCallbackListName(String listName) {
-                    mActivityTitle = listName;
+                public void onCallback(Object listName) {
+                    mActivityTitle = (String) listName;
                     getSupportActionBar().setTitle(mActivityTitle);
                 }
             });
         } else {
             FirebaseDB.getTaskListName(taskListID, new FirebaseDB.FirebaseCallback() {
                 @Override
-                public void onCallback(List<TaskModel> tasks) {
-
-                }
-
-                @Override
-                public void onCallbackListName(String listName) {
-                    mActivityTitle = listName;
+                public void onCallback(Object listName) {
+                    mActivityTitle = (String) listName;
                     getSupportActionBar().setTitle(mActivityTitle);
                 }
             });
@@ -133,8 +121,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_personal) {
-            Toast.makeText(this, "Peronal Selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Personal Selected", Toast.LENGTH_SHORT).show();
         }
+
+        Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -163,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupCreateListBtn(){
+        Button createListBtn;
+
         createListBtn = findViewById(R.id.addListBtn);
         createListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,7 +173,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String text = input.getText().toString();
-                        Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+                        String id = FirebaseDB.createList(user.getUid(), text);
+                        //mNavigationView.getMenu().add(text).setTooltipText(id);
+
                     }
                 });
 
