@@ -1,6 +1,7 @@
 package com.leonchai.todolists;
 
 import android.app.DatePickerDialog;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +27,8 @@ public class addTaskActivity extends AppCompatActivity {
     private EditText nameEditText;
     private EditText descriptionEditText;
     private TextView dueDateTextView;
+    private TaskModel task;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,13 +37,27 @@ public class addTaskActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolBar);
         toolbar.setTitle("New Task");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
+        if(getIntent().hasExtra("task")) {
+            Bundle data = getIntent().getExtras();
+            task = data.getParcelable("task");
+        }
+
         nameEditText = (EditText) findViewById(R.id.nameEditText);
         descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
         dueDateTextView = (TextView) findViewById(R.id.dueDateTextView);
+
+        if(task != null){
+            nameEditText.setText(task.getName());
+            descriptionEditText.setText(task.getDescription());
+            dueDateTextView.setText(task.getDueDate());
+        }
         showDatePickerDialog();
 
     }
@@ -67,6 +84,9 @@ public class addTaskActivity extends AppCompatActivity {
                 String dueDate = dueDateTextView.getText().toString();
 
                 TaskModel newTask = new TaskModel(taskName, dueDate, description);
+                if(task != null){
+                    newTask.setId(task.getId());
+                }
                 FirebaseDB.addTask(user.getUid(), DoFragment.TABLE_NAME, newTask);
 
                 Toast.makeText(this, "Saved Task", Toast.LENGTH_SHORT)
@@ -74,12 +94,17 @@ public class addTaskActivity extends AppCompatActivity {
                 finish();
                 break;
 
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
             default:
                 break;
         }
 
         return true;
     }
+    
 
     private void showDatePickerDialog(){
         Button dueDatebtn = (Button) findViewById(R.id.dueDateButton);

@@ -1,16 +1,18 @@
 package com.leonchai.todolists;
 
+import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class TaskDetailActivity extends AppCompatActivity {
 
     private Toolbar toolBar;
+    private TaskModel task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,10 +20,15 @@ public class TaskDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task_detail);
 
         toolBar = findViewById(R.id.taskDetailToolbar);
+        toolBar.setTitle("Task");
         setSupportActionBar(toolBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolBar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+
 
         Bundle data = getIntent().getExtras();
-        TaskModel task = data.getParcelable("task");
+        task = data.getParcelable("task");
 
         TextView nameTextView = findViewById(R.id.nameTextView);
         TextView dueDateView = findViewById(R.id.dueDateTextView);
@@ -48,12 +55,21 @@ public class TaskDetailActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        //TODO
         if (id == R.id.action_edit) {
-            Toast.makeText(this, "Editing", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, addTaskActivity.class);
+            intent.putExtra("task", task);
+            startActivity(intent);
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }
