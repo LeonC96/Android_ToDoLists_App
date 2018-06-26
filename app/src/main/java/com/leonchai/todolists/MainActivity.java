@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
     private String taskListID;
+    private Button createListBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +55,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        // Left side navigation view setup
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav);
 
         if (mNavigationView != null) {
             mNavigationView.setNavigationItemSelectedListener(this);
         }
         mNavigationView.getMenu().getItem(0).setChecked(true);
-
+        setupCreateListBtn();
 
         auth = FirebaseAuth.getInstance();
 
@@ -102,33 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-        //adding fragments
-        DoFragment doFragment = new DoFragment();
-        DoingFragment doingFragment = new DoingFragment();
-        DoneFragment doneFragment = new DoneFragment();
-
-        //send task list ID to each fragment
-        Bundle bundle = new Bundle();
-        bundle.putString("taskListID", taskListID);
-        doFragment.setArguments(bundle);
-        doingFragment.setArguments(bundle);
-        doneFragment.setArguments(bundle);
-
-        adapter.AddFragment(doFragment, "DO");
-        adapter.AddFragment(doingFragment, "DOING");
-        adapter.AddFragment(doneFragment, "DONE");
-
-        viewPager.setOffscreenPageLimit(2);
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-
+        setupTabs();
     }
 
     @Override
@@ -178,6 +155,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setupCreateListBtn(){
+        createListBtn = findViewById(R.id.addListBtn);
+        createListBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+    private void setupTabs(){
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        //adding fragments
+        DoFragment doFragment = new DoFragment();
+        DoingFragment doingFragment = new DoingFragment();
+        DoneFragment doneFragment = new DoneFragment();
+
+        //send task list ID to each fragment
+        Bundle bundle = new Bundle();
+        bundle.putString("taskListID", taskListID);
+        doFragment.setArguments(bundle);
+        doingFragment.setArguments(bundle);
+        doneFragment.setArguments(bundle);
+
+        adapter.AddFragment(doFragment, "DO");
+        adapter.AddFragment(doingFragment, "DOING");
+        adapter.AddFragment(doneFragment, "DONE");
+
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
 
