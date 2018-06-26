@@ -20,8 +20,11 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ViewPager viewPager;
     private FirebaseUser user;
 
-    private NavigationView mNavigationView;
+    private ListView mNavigationList;
+    private ArrayAdapter<String> mAdapter;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
@@ -58,12 +62,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setHomeButtonEnabled(true);
 
         // Left side navigation view setup
-        mNavigationView = (NavigationView) findViewById(R.id.nav);
+        mNavigationList = (ListView) findViewById(R.id.nav);
+        addDrawerItems();
 
-        if (mNavigationView != null) {
-            mNavigationView.setNavigationItemSelectedListener(this);
-        }
-        mNavigationView.getMenu().getItem(0).setChecked(true);
 
         setupCreateListBtn();
 
@@ -99,6 +100,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         setupTabs();
+    }
+
+    private void addDrawerItems() {
+        String[] osArray = { "Personal", "iOS", "Windows", "OS X", "Linux" };
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
+        mNavigationList.setAdapter(mAdapter);
+        mNavigationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "Time for an upgrade!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -153,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+
     private void setupCreateListBtn(){
         Button createListBtn;
 
@@ -194,6 +208,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+
+
 
     private void setupTabs(){
         tabLayout = (TabLayout) findViewById(R.id.tabs);

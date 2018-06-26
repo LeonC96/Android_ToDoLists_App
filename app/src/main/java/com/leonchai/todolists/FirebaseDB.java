@@ -110,6 +110,7 @@ public class FirebaseDB {
         Map<String, Object> newProject = new HashMap<>();
         newProject.put(FIREBASE_TASK_LIST_NAME, listName);
         newProject.put(FIREBASE_USERS, userID);
+
         DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).child(listID).updateChildren(newProject);
 
         return listID;
