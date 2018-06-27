@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.leonchai.todolists.dataModels.TaskModel;
+
 import java.util.ArrayList;
 import java.util.List;
 

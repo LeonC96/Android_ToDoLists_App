@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.leonchai.todolists.dataModels.TaskModel;
+
 public class TaskDetailActivity extends AppCompatActivity {
 
     private Toolbar toolBar;

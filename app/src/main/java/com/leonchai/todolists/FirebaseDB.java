@@ -5,8 +5,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.leonchai.todolists.dataModels.TaskListModel;
+import com.leonchai.todolists.dataModels.TaskModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +117,34 @@ public class FirebaseDB {
         DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).child(listID).updateChildren(newProject);
 
         return listID;
+    }
+
+    //TODO
+    public static void getUserLists(String userID, final FirebaseCallback callback){
+        DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                List<TaskListModel> listsNames = new ArrayList<>();
+
+                for(DataSnapshot list : dataSnapshot.getChildren()){
+                    String id = list.getKey();
+                    System.out.println(id);
+                    String name = list.child(FIREBASE_TASK_LIST_NAME).getValue().toString();
+                    List<String> userIDs = Arrays.asList(list.child("users").getValue().toString().split(","));
+                    TaskListModel taskList = new TaskListModel(id, name, userIDs);
+                    listsNames.add(taskList);
+                }
+
+                callback.onCallback(listsNames);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public static void getTaskListName(String taskListID, final FirebaseCallback callback){

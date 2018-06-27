@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -29,11 +27,12 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.leonchai.todolists.dataModels.TaskListModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity{
 
     private FirebaseAuth auth;
     private TabLayout tabLayout;
@@ -41,11 +40,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseUser user;
 
     private ListView mNavigationList;
-    private ArrayAdapter<String> mAdapter;
+    private TaskListAdapter mTaskListAdapter;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
     private String taskListID;
+
+    private List<TaskListModel> taskLists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,14 +64,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Left side navigation view setup
         mNavigationList = (ListView) findViewById(R.id.nav);
-        addDrawerItems();
-
 
         setupCreateListBtn();
 
         auth = FirebaseAuth.getInstance();
 
         user = auth.getCurrentUser();
+
+        addDrawerItems();
+        fetchTaskLists();
 
         //check if just logged in or switch to different list
         taskListID = getIntent().getStringExtra("taskListID");
@@ -103,13 +105,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void addDrawerItems() {
-        String[] osArray = { "Personal", "iOS", "Windows", "OS X", "Linux" };
-        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
-        mNavigationList.setAdapter(mAdapter);
+        taskLists = new ArrayList<>();
+        mTaskListAdapter = new TaskListAdapter(this, taskLists);
+        mNavigationList.setAdapter(mTaskListAdapter);
         mNavigationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, "Time for an upgrade!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, taskLists.get(position).getName(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -127,21 +129,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    // For Navigation drawer items
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_personal) {
-            Toast.makeText(this, "Personal Selected", Toast.LENGTH_SHORT).show();
-        }
-
-        Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
-
-
-        return super.onOptionsItemSelected(item);
-    }
 
     // For tool button
     @Override
@@ -209,7 +196,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-
+    private void fetchTaskLists(){
+        List<String> defaultUser = new ArrayList<>();
+        defaultUser.add(user.getUid());
+        final TaskListModel userPersonal = new TaskListModel(user.getUid(), "Personal", defaultUser);
+        FirebaseDB.getUserLists(user.getUid(), new FirebaseDB.FirebaseCallback() {
+            @Override
+            public void onCallback(Object taskList) {
+                taskLists.clear();
+                taskLists.add(userPersonal);
+                taskLists.addAll((List<TaskListModel>) taskList);
+                mTaskListAdapter.notifyDataSetChanged();
+            }
+        });
+    }
 
     private void setupTabs(){
         tabLayout = (TabLayout) findViewById(R.id.tabs);

@@ -1,4 +1,4 @@
-package com.leonchai.todolists;
+package com.leonchai.todolists.dataModels;
 
 import android.os.Parcel;
 import android.os.Parcelable;

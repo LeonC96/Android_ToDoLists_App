@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.leonchai.todolists.dataModels.TaskModel;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
 
@@ -136,7 +137,6 @@ public class DoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("RESUME");
 
         fetchData();
 
@@ -147,7 +147,6 @@ public class DoFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
-            System.out.println("VISIBLE");
             if(getView() != null){
                 fetchData();
             }
