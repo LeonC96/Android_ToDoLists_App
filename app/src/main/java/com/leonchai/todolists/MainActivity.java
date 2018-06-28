@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity{
 
     private List<TaskListModel> taskLists;
     private TaskListModel currentTaskList;
-    private TaskListModel userPersonal;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,8 +76,8 @@ public class MainActivity extends AppCompatActivity{
 
         List<String> userIDInList = new ArrayList<>();
         userIDInList.add(user.getUid());
-        userPersonal = new TaskListModel(user.getUid(), "Personal", userIDInList);
-        currentTaskList = userPersonal;
+        currentTaskList = new TaskListModel(user.getUid(), "Personal", userIDInList);
+
 
         // Left side navigation view setup
         mNavigationList = (ListView) findViewById(R.id.nav);
