@@ -1,4 +1,4 @@
-package com.leonchai.todolists;
+package com.leonchai.todolists.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.leonchai.todolists.R;
 import com.leonchai.todolists.dataModels.TaskModel;
 
 import java.util.ArrayList;

@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.leonchai.todolists.adapters.TaskListAdapter;
 import com.leonchai.todolists.dataModels.TaskListModel;
 
 import java.util.ArrayList;
@@ -47,7 +48,8 @@ public class MainActivity extends AppCompatActivity{
     private String taskListID;
 
     private List<TaskListModel> taskLists;
-
+    private TaskListModel currentTaskList;
+    private TaskListModel userPersonal;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,11 +74,15 @@ public class MainActivity extends AppCompatActivity{
 
         }
 
+        List<String> userIDInList = new ArrayList<>();
+        userIDInList.add(user.getUid());
+        userPersonal = new TaskListModel(user.getUid(), "Personal", userIDInList);
+        currentTaskList = userPersonal;
+
         // Left side navigation view setup
         mNavigationList = (ListView) findViewById(R.id.nav);
         setupCreateListBtn();
-        addDrawerItems();
-        fetchTaskLists();
+        setupDrawerItems();
 
         // check if new user of existing
         String username = getIntent().getStringExtra("username");
@@ -101,17 +107,22 @@ public class MainActivity extends AppCompatActivity{
         setupTabs();
     }
 
-    private void addDrawerItems() {
+    private void setupDrawerItems() {
         taskLists = new ArrayList<>();
         mTaskListAdapter = new TaskListAdapter(this, taskLists);
         mNavigationList.setAdapter(mTaskListAdapter);
         mNavigationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TaskListModel selectedTaskList = taskLists.get(position);
 
-                view.setBackgroundColor(getResources().getColor(
-                        R.color.pressed_color));
-                Toast.makeText(MainActivity.this, taskLists.get(position).getName(), Toast.LENGTH_SHORT).show();
+                if(selectedTaskList.getId().equals(currentTaskList.getId())){
+                    Toast.makeText(MainActivity.this, "Already Selected", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    currentTaskList = selectedTaskList;
+                    Toast.makeText(MainActivity.this, taskLists.get(position).getName(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -147,6 +158,7 @@ public class MainActivity extends AppCompatActivity{
 
         // Activate the navigation drawer toggle
         if (mDrawerToggle.onOptionsItemSelected(item)) {
+            fetchTaskLists();
             return true;
         }
 
