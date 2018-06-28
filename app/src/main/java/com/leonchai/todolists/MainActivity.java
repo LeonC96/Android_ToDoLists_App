@@ -62,17 +62,8 @@ public class MainActivity extends AppCompatActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        // Left side navigation view setup
-        mNavigationList = (ListView) findViewById(R.id.nav);
-
-        setupCreateListBtn();
-
         auth = FirebaseAuth.getInstance();
-
         user = auth.getCurrentUser();
-
-        addDrawerItems();
-        fetchTaskLists();
 
         //check if just logged in or switch to different list
         taskListID = getIntent().getStringExtra("taskListID");
@@ -80,6 +71,12 @@ public class MainActivity extends AppCompatActivity{
             taskListID = user.getUid();
 
         }
+
+        // Left side navigation view setup
+        mNavigationList = (ListView) findViewById(R.id.nav);
+        setupCreateListBtn();
+        addDrawerItems();
+        fetchTaskLists();
 
         // check if new user of existing
         String username = getIntent().getStringExtra("username");
@@ -111,6 +108,9 @@ public class MainActivity extends AppCompatActivity{
         mNavigationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                view.setBackgroundColor(getResources().getColor(
+                        R.color.pressed_color));
                 Toast.makeText(MainActivity.this, taskLists.get(position).getName(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity{
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String text = input.getText().toString();
                         String id = FirebaseDB.createList(user.getUid(), text);
-                        //mNavigationView.getMenu().add(text).setTooltipText(id);
+                        fetchTaskLists();
 
                     }
                 });

@@ -10,4 +10,6 @@
     <color name="darkYellow">#F5C102</color>
     <color name="green">#1CCA00</color>
     <color name="black">#000000</color>
+    <color name="pressed_color">#4d90fe</color>
+    <color name="default_color">#ffffff</color>
 </resources>
