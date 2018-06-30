@@ -16,6 +16,7 @@ import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -161,6 +162,7 @@ public class DoingFragment extends Fragment {
                 if(!theTasks.isEmpty()) {
                     tasksList.clear();
                     tasksList.addAll(theTasks);
+                    Collections.sort(tasksList, new TaskModelComparator());
                     swipeAdapter.notifyDataSetChanged();
                 }
             }

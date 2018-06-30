@@ -36,8 +36,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity{
 
     private FirebaseAuth auth;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
     private FirebaseUser user;
 
     private ListView mNavigationList;
@@ -224,6 +222,9 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void setupTabs(){
+        TabLayout tabLayout;
+        ViewPager viewPager;
+
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);

@@ -2,6 +2,11 @@ package com.leonchai.todolists.dataModels;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TaskModel implements Parcelable{
     private String name;
@@ -47,17 +52,6 @@ public class TaskModel implements Parcelable{
          description = in.readString();
     }
 
-    public String getName(){
-        return name;
-    }
-
-    public void setName(String name){
-        if(name != null || !name.equals("")){
-            this.name = name;
-        }
-    }
-
-
     @Override
     public int describeContents() {
         return 0;
@@ -71,6 +65,28 @@ public class TaskModel implements Parcelable{
         parcel.writeString(id);
         parcel.writeString(description);
 
+    }
+
+    public Date getDueDateAsDate(){
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        Date date = null;
+        try {
+            date = sdf.parse(dueDate);
+        } catch (ParseException ex){
+            Log.e(this.getClass().getName(), "Exception", ex);
+        }
+
+        return date;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void setName(String name){
+        if(name != null || !name.equals("")){
+            this.name = name;
+        }
     }
 
     public String getDueDate(){
