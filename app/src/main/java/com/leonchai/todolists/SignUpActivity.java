@@ -88,7 +88,7 @@ public class SignUpActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                            intent.putExtra("username", name);
+                            intent.putExtra(MainActivity.EXTRA_USERNAME, name);
                             startActivity(intent);
                             finish();
                         }

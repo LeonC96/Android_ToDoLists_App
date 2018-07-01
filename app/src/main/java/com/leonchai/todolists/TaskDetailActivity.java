@@ -9,12 +9,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.TaskModel;
 
 public class TaskDetailActivity extends AppCompatActivity {
 
     private Toolbar toolBar;
     private TaskModel task;
+    private TaskListModel currentTaskList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class TaskDetailActivity extends AppCompatActivity {
 
         Bundle data = getIntent().getExtras();
         task = data.getParcelable("task");
+        currentTaskList = data.getParcelable(MainActivity.EXTRA_TASKLIST);
 
         TextView nameTextView = findViewById(R.id.nameTextView);
         TextView dueDateView = findViewById(R.id.dueDateTextView);
@@ -57,10 +60,10 @@ public class TaskDetailActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //TODO
         if (id == R.id.action_edit) {
             Intent intent = new Intent(this, addTaskActivity.class);
             intent.putExtra("task", task);
+            intent.putExtra(MainActivity.EXTRA_TASKLIST, currentTaskList);
             startActivity(intent);
             finish();
             return true;

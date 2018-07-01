@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.leonchai.todolists.adapters.TaskAdapter;
+import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.TaskModel;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
@@ -25,7 +26,7 @@ public class DoFragment extends Fragment {
 
     public static final String TABLE_NAME = "doTasks";
 
-    private String taskListID;
+    private TaskListModel currentTaskList;
 
     private ListView doListView;
     private View view;
@@ -55,7 +56,7 @@ public class DoFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_do, container, false);
 
-        taskListID = getArguments().getString("taskListID");
+        currentTaskList = getArguments().getParcelable(MainActivity.EXTRA_TASKLIST);
 
         doListView = (ListView) view.findViewById(R.id.doListView);
 
@@ -129,6 +130,7 @@ public class DoFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
                 intent.putExtra("task", tasksList.get(i));
+                intent.putExtra(MainActivity.EXTRA_TASKLIST, currentTaskList);
                 startActivity(intent);
             }
         });
@@ -157,7 +159,7 @@ public class DoFragment extends Fragment {
 
     // fetches Firebse DB data
     private void fetchData(){
-        FirebaseDB.getList(taskListID, TABLE_NAME, new FirebaseDB.FirebaseCallback() {
+        FirebaseDB.getList(currentTaskList.getId(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(Object tasks) {
                 ProgressBar progressBar = view.findViewById(R.id.progressBar);

@@ -23,10 +23,9 @@ public class FirebaseDB {
     private static final DatabaseReference DB = FirebaseDatabase.getInstance().getReference();
 
 
-    public static void createUserTable(final String userID, final String name, String email, final FirebaseCallback callback){
+    public static void createUserTable(final String userID, final String name, String email){
         // CHECK FOR EXIST USER
         final String userEmail = email;
-        final String userName = name;
 
         DB.child(FIREBASE_USERS).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -34,7 +33,7 @@ public class FirebaseDB {
                 if(!dataSnapshot.hasChild(userID)){
                     HashMap<String, String> userDetail = new HashMap<>();
                     userDetail.put("email", userEmail);
-                    userDetail.put("name", userName);
+                    userDetail.put("name", name);
 
                     DB.child(FIREBASE_USERS).child(userID).setValue(userDetail);
 
@@ -45,7 +44,6 @@ public class FirebaseDB {
 
                     DB.child(userID).child(FIREBASE_TASK_LIST_NAME).setValue("Personal");
 
-                    callback.onCallback("Personal");
                 }
             }
 
@@ -119,7 +117,6 @@ public class FirebaseDB {
         return listID;
     }
 
-    //TODO
     public static void getUserLists(String userID, final FirebaseCallback callback){
         DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -129,7 +126,6 @@ public class FirebaseDB {
 
                 for(DataSnapshot list : dataSnapshot.getChildren()){
                     String id = list.getKey();
-                    System.out.println(id);
                     String name = list.child(FIREBASE_TASK_LIST_NAME).getValue().toString();
                     List<String> userIDs = Arrays.asList(list.child("users").getValue().toString().split(","));
                     TaskListModel taskList = new TaskListModel(id, name, userIDs);
@@ -147,22 +143,6 @@ public class FirebaseDB {
         });
     }
 
-    public static void getTaskListName(String taskListID, final FirebaseCallback callback){
-        DB.child(taskListID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String name = dataSnapshot.child(FIREBASE_TASK_LIST_NAME).getValue().toString();
-
-                callback.onCallback(name);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     public static void removeTask(String listID, String tableName, TaskModel task){
         DB.child(listID).child(tableName).child(task.getId()).removeValue();
     }
@@ -170,7 +150,6 @@ public class FirebaseDB {
 
     public interface FirebaseCallback{
         void onCallback(Object tasks);
-
     }
 }
 

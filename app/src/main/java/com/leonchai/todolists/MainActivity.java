@@ -35,6 +35,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
 
+    public static final String EXTRA_USERNAME = "username";
+    public static final String EXTRA_TASKLIST = "taskList";
+
     private FirebaseAuth auth;
     private FirebaseUser user;
 
@@ -43,10 +46,9 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
-    private String taskListID;
 
     private List<TaskListModel> taskLists;
-    private TaskListModel currentTaskList;
+    private TaskListModel currentTaskList = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity{
 
         setupDrawer();
 
+        // setup actionBar
         Toolbar toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -64,43 +67,37 @@ public class MainActivity extends AppCompatActivity{
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+        System.out.println(user.getUid());
 
         //check if just logged in or switch to different list
-        taskListID = getIntent().getStringExtra("taskListID");
-        if(taskListID == null){
-            taskListID = user.getUid();
-
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            if(extras.containsKey(EXTRA_TASKLIST)){
+                currentTaskList = extras.getParcelable(EXTRA_TASKLIST);
+                System.out.println(currentTaskList.getId());
+            }
         }
 
-        List<String> userIDInList = new ArrayList<>();
-        userIDInList.add(user.getUid());
-        currentTaskList = new TaskListModel(user.getUid(), "Personal", userIDInList);
+        if(currentTaskList == null){
+            List<String> userIDInList = new ArrayList<>();
+            userIDInList.add(user.getUid());
+            currentTaskList = new TaskListModel(user.getUid(), "Personal", userIDInList);
+        }
+
+        // check if new user or existing
+        String username = getIntent().getStringExtra(EXTRA_USERNAME);
+        if(username != null) {
+            FirebaseDB.createUserTable(user.getUid(), username, user.getEmail());
+        }
+
+        mActivityTitle = currentTaskList.getName();
+        getSupportActionBar().setTitle(mActivityTitle);
 
 
         // Left side navigation view setup
         mNavigationList = (ListView) findViewById(R.id.nav);
         setupCreateListBtn();
         setupDrawerItems();
-
-        // check if new user of existing
-        String username = getIntent().getStringExtra("username");
-        if(username != null) {
-            FirebaseDB.createUserTable(user.getUid(), username, user.getEmail(), new FirebaseDB.FirebaseCallback() {
-                @Override
-                public void onCallback(Object listName) {
-                    mActivityTitle = (String) listName;
-                    getSupportActionBar().setTitle(mActivityTitle);
-                }
-            });
-        } else {
-            FirebaseDB.getTaskListName(taskListID, new FirebaseDB.FirebaseCallback() {
-                @Override
-                public void onCallback(Object listName) {
-                    mActivityTitle = (String) listName;
-                    getSupportActionBar().setTitle(mActivityTitle);
-                }
-            });
-        }
 
         setupTabs();
     }
@@ -119,8 +116,13 @@ public class MainActivity extends AppCompatActivity{
 
                 } else {
                     currentTaskList = selectedTaskList;
-                    Toast.makeText(MainActivity.this, taskLists.get(position).getName(), Toast.LENGTH_SHORT).show();
+                    Intent intent = getIntent();
+                    intent.putExtra(EXTRA_TASKLIST, currentTaskList);
+                    finish();
+                    startActivity(intent);
+                    //Toast.makeText(MainActivity.this, taskLists.get(position).getName(), Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
     }
@@ -128,7 +130,6 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        auth.signOut();
     }
 
     @Override
@@ -150,6 +151,7 @@ public class MainActivity extends AppCompatActivity{
         if (id == R.id.action_add) {
 
             Intent intent = new Intent(MainActivity.this, addTaskActivity.class);
+            intent.putExtra(EXTRA_TASKLIST, currentTaskList);
             startActivity(intent);
             return true;
         }
@@ -180,6 +182,7 @@ public class MainActivity extends AppCompatActivity{
                         PorterDuff.Mode.SRC_ATOP);
                 builder.setView(input);
 
+                //TODO: Create new task list and redirect to new list
                 builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -239,7 +242,7 @@ public class MainActivity extends AppCompatActivity{
 
         //send task list ID to each fragment
         Bundle bundle = new Bundle();
-        bundle.putString("taskListID", taskListID);
+        bundle.putParcelable("taskList", currentTaskList);
         doFragment.setArguments(bundle);
         doingFragment.setArguments(bundle);
         doneFragment.setArguments(bundle);

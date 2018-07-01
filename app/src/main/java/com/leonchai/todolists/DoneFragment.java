@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.leonchai.todolists.adapters.TaskAdapter;
+import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.TaskModel;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
@@ -26,7 +27,7 @@ public class DoneFragment extends Fragment {
 
     private ListView doneListView;
 
-    private String taskListID;
+    private TaskListModel currentTaskList;
 
     private TaskAdapter taskAdapter;
     private SwipeActionAdapter swipeAdapter;
@@ -53,7 +54,7 @@ public class DoneFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_do, container, false);
 
-        taskListID = getArguments().getString("taskListID");
+        currentTaskList = getArguments().getParcelable(MainActivity.EXTRA_TASKLIST);
 
         doneListView = (ListView) view.findViewById(R.id.doListView);
 
@@ -127,6 +128,7 @@ public class DoneFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
                 intent.putExtra("task", tasksList.get(i));
+                intent.putExtra(MainActivity.EXTRA_TASKLIST, currentTaskList);
                 startActivity(intent);
             }
         });
@@ -153,7 +155,7 @@ public class DoneFragment extends Fragment {
 
     // fetches Firebse DB data
     private void fetchData(){
-        FirebaseDB.getList(taskListID, TABLE_NAME, new FirebaseDB.FirebaseCallback() {
+        FirebaseDB.getList(currentTaskList.getId(), TABLE_NAME, new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(Object tasks) {
                 List<TaskModel> theTasks = (List<TaskModel>) tasks;

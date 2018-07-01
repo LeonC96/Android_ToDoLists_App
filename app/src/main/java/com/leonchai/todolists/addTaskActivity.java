@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.TaskModel;
 
 import java.util.Calendar;
@@ -29,6 +30,7 @@ public class addTaskActivity extends AppCompatActivity {
     private EditText descriptionEditText;
     private TextView dueDateTextView;
     private TaskModel task;
+    private TaskListModel currentTaskList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +47,13 @@ public class addTaskActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
-        if(getIntent().hasExtra("task")) {
-            Bundle data = getIntent().getExtras();
+        Bundle data = getIntent().getExtras();
+        currentTaskList = data.getParcelable(MainActivity.EXTRA_TASKLIST);
+
+        if(data.containsKey("task")) {
             task = data.getParcelable("task");
         }
+
 
         nameEditText = (EditText) findViewById(R.id.nameEditText);
         descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
@@ -88,7 +93,7 @@ public class addTaskActivity extends AppCompatActivity {
                 if(task != null){
                     newTask.setId(task.getId());
                 }
-                FirebaseDB.addTask(user.getUid(), DoFragment.TABLE_NAME, newTask);
+                FirebaseDB.addTask(currentTaskList.getId(), DoFragment.TABLE_NAME, newTask);
 
                 Toast.makeText(this, "Saved Task", Toast.LENGTH_SHORT)
                         .show();
