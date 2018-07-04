@@ -147,6 +147,11 @@ public class FirebaseDB {
         DB.child(listID).child(tableName).child(task.getId()).removeValue();
     }
 
+    public static void deleteTaskList(String listID, String userID){
+        DB.child(listID).removeValue();
+        DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).child(listID).removeValue();
+    }
+
 
     public interface FirebaseCallback{
         void onCallback(Object tasks);

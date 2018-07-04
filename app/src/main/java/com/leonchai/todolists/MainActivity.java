@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -67,7 +68,6 @@ public class MainActivity extends AppCompatActivity{
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-        System.out.println(user.getUid());
 
         //check if just logged in or switch to different list
         Bundle extras = getIntent().getExtras();
@@ -120,9 +120,30 @@ public class MainActivity extends AppCompatActivity{
                     intent.putExtra(EXTRA_TASKLIST, currentTaskList);
                     finish();
                     startActivity(intent);
-                    //Toast.makeText(MainActivity.this, taskLists.get(position).getName(), Toast.LENGTH_SHORT).show();
                 }
 
+            }
+        });
+
+        //Setup long press for deleting task list
+        mNavigationList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final TaskListModel selectedTaskList = taskLists.get(i);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Options");
+                final String[] options = new String[]{"Delete"};
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        FirebaseDB.deleteTaskList(selectedTaskList.getId(), user.getUid());
+                        mDrawerLayout.closeDrawers();
+                        Toast.makeText(MainActivity.this, options[i], Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.show();
+                return true;
             }
         });
     }
@@ -186,9 +207,16 @@ public class MainActivity extends AppCompatActivity{
                 builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String text = input.getText().toString();
-                        String id = FirebaseDB.createList(user.getUid(), text);
-                        fetchTaskLists();
+                        String taskListName = input.getText().toString();
+                        String id = FirebaseDB.createList(user.getUid(), taskListName);
+                        List<String> users = new ArrayList<>();
+                        users.add(user.getUid());
+                        currentTaskList = new TaskListModel(id, taskListName, users);
+
+                        Intent intent = getIntent();
+                        intent.putExtra(EXTRA_TASKLIST, currentTaskList);
+                        startActivity(intent);
+                        finish();
 
                     }
                 });
@@ -290,6 +318,17 @@ public class MainActivity extends AppCompatActivity{
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else if (mDrawerLayout.isDrawerOpen(GravityCompat.END)) {  /*Closes the Appropriate Drawer*/
+            mDrawerLayout.closeDrawer(GravityCompat.END);
+        } else {
+            super.onBackPressed();
+        }
     }
 
 
