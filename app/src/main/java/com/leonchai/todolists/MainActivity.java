@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity{
     private ListView mNavigationList;
     private TaskListAdapter mTaskListAdapter;
     private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
+    private ActionBarDrawerToggle drawerToggle;
 
     private List<TaskListModel> taskLists;
     private TaskListModel currentTaskList = null;
@@ -58,13 +58,12 @@ public class MainActivity extends AppCompatActivity{
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
 
-        setupDrawer();
-
         // setup actionBar
         Toolbar toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_lists);
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
@@ -97,12 +96,12 @@ public class MainActivity extends AppCompatActivity{
         // Left side navigation view setup
         mNavigationList = (ListView) findViewById(R.id.nav);
         setupCreateListBtn();
-        setupDrawerItems();
+        setupTaskListNav();
 
         setupTabs();
     }
 
-    private void setupDrawerItems() {
+    private void setupTaskListNav() {
         taskLists = new ArrayList<>();
         mTaskListAdapter = new TaskListAdapter(this, taskLists);
         mNavigationList.setAdapter(mTaskListAdapter);
@@ -133,13 +132,20 @@ public class MainActivity extends AppCompatActivity{
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Options");
-                final String[] options = new String[]{"Delete"};
+                final String[] options = new String[]{"Delete", "Add Users"};
                 builder.setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        FirebaseDB.deleteTaskList(selectedTaskList.getId(), user.getUid());
-                        mDrawerLayout.closeDrawers();
-                        Toast.makeText(MainActivity.this, options[i], Toast.LENGTH_SHORT).show();
+
+                        if(options[i].equals("Delete")) {
+                            FirebaseDB.deleteTaskList(selectedTaskList.getId(), user.getUid());
+                            mDrawerLayout.closeDrawers();
+                            Toast.makeText(MainActivity.this, options[i], Toast.LENGTH_SHORT).show();
+                        }
+
+                        if(options[i].equals("Add Users")){
+
+                        }
                     }
                 });
                 builder.show();
@@ -177,9 +183,27 @@ public class MainActivity extends AppCompatActivity{
             return true;
         }
 
-        // Activate the navigation drawer toggle
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            fetchTaskLists();
+        //TODO
+        if(id == R.id.action_users){
+            if(mDrawerLayout.isDrawerOpen(GravityCompat.END)){
+                mDrawerLayout.closeDrawer(GravityCompat.END);
+                mActivityTitle = currentTaskList.getName();
+            } else {
+                mDrawerLayout.closeDrawers();
+                mDrawerLayout.openDrawer(GravityCompat.END);
+            }
+            return true;
+        }
+
+        if(id == android.R.id.home){
+            if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                mActivityTitle = currentTaskList.getName();
+            } else {
+                mDrawerLayout.closeDrawers();
+                fetchTaskLists();
+                mDrawerLayout.openDrawer(GravityCompat.START);
+            }
             return true;
         }
 
@@ -285,39 +309,14 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-    private void setupDrawer() {
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
-
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("To-Do Lists");
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                getSupportActionBar().setTitle(mActivityTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-    }
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override

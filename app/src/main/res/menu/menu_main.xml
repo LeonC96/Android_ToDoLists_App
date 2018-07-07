@@ -4,9 +4,15 @@
       tools:context="com.leonchai.todolists.MainActivity">
     <item
         android:id="@+id/action_add"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="@string/action_add"
         android:icon="@drawable/ic_action_add"
+        app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/action_users"
+        android:title="Users"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_action_users"
         app:showAsAction="always"/>
 </menu>
