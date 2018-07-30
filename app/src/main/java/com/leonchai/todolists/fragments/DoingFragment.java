@@ -1,4 +1,4 @@
-package com.leonchai.todolists;
+package com.leonchai.todolists.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,11 @@ import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.leonchai.todolists.FirebaseDB;
+import com.leonchai.todolists.R;
+import com.leonchai.todolists.TaskModelComparator;
+import com.leonchai.todolists.activities.MainActivity;
+import com.leonchai.todolists.activities.TaskDetailActivity;
 import com.leonchai.todolists.adapters.TaskAdapter;
 import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.TaskModel;
@@ -21,12 +26,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DoneFragment extends Fragment {
 
-    public static final String TABLE_NAME = "doneTasks";
+public class DoingFragment extends Fragment {
 
-    private ListView doneListView;
+    public static final String TABLE_NAME = "doingTasks";
 
+    private ListView doingListView;
     private TaskListModel currentTaskList;
 
     private TaskAdapter taskAdapter;
@@ -36,7 +41,7 @@ public class DoneFragment extends Fragment {
 
     private ArrayList<TaskModel> tasksList = new ArrayList<>();
 
-    public DoneFragment() {
+    public DoingFragment() {
         // Required empty public constructor
     }
 
@@ -56,23 +61,22 @@ public class DoneFragment extends Fragment {
 
         currentTaskList = getArguments().getParcelable(MainActivity.EXTRA_TASKLIST);
 
-        doneListView = (ListView) view.findViewById(R.id.doListView);
+        doingListView = (ListView) view.findViewById(R.id.doListView);
 
         taskAdapter = new TaskAdapter(getActivity(),tasksList);
 
         swipeAdapter = new SwipeActionAdapter(taskAdapter);
-        swipeAdapter.setListView(doneListView);
+        swipeAdapter.setListView(doingListView);
 
-        doneListView.setAdapter(swipeAdapter);
+        doingListView.setAdapter(swipeAdapter);
 
         // Add Left swipe
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.incomplete_bg);
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.incomplete_bg);
-
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.unassigned_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.unassigned_bg);
 
         //Add Right swipe
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.delete_done_bg);
-        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT, R.layout.delete_done_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.done_bg);
+        swipeAdapter.addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT, R.layout.done_bg);
 
         // Disable short swipes incase of accidents
         swipeAdapter.setNormalSwipeFraction(1);
@@ -102,18 +106,23 @@ public class DoneFragment extends Fragment {
                     TaskModel currentTask = tasksList.get(currentPosition);
 
                     switch (currentDirection) {
+                        // Move back to do fragment
                         case DIRECTION_FAR_LEFT:
-                            // Move to Done Fragment
-                            // Add task to doing fragment list
-                            FirebaseDB.addTask(user.getUid(), DoingFragment.TABLE_NAME,currentTask);
 
-                            // Removes task from list and from firebase
+                            // Add task to do fragment list
+                            currentTask.setUser("");
+                            FirebaseDB.addTask(user.getUid(), DoFragment.TABLE_NAME,currentTask);
+
                             tasksList.remove(currentPosition);
                             FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
                             swipeAdapter.notifyDataSetChanged();
                             break;
+
+                        // Move to Done Fragment
                         case DIRECTION_FAR_RIGHT:
-                            // Delete
+                            // Add task to done fragment list
+                            FirebaseDB.addTask(user.getUid(), DoneFragment.TABLE_NAME,currentTask);
+
                             tasksList.remove(currentPosition);
                             FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
                             swipeAdapter.notifyDataSetChanged();
@@ -123,7 +132,7 @@ public class DoneFragment extends Fragment {
             }
         });
 
-        doneListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        doingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
@@ -167,6 +176,7 @@ public class DoneFragment extends Fragment {
                     swipeAdapter.notifyDataSetChanged();
                 }
             }
+
         });
     }
 

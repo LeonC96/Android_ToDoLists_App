@@ -7,6 +7,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.TaskModel;
+import com.leonchai.todolists.dataModels.UserModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,6 +151,50 @@ public class FirebaseDB {
     public static void deleteTaskList(String listID, String userID){
         DB.child(listID).removeValue();
         DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).child(listID).removeValue();
+    }
+
+    // TODO: TEST
+    public static void getListUsers(TaskListModel currentList, final FirebaseCallback callback){
+        final List<String> usersID = currentList.getUserIDs();
+
+            DB.child(FIREBASE_USERS).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot projects) {
+                    List<UserModel> users = new ArrayList<>();
+                    for(String id : usersID){
+                        String email = projects.child(id).child("email").getValue().toString();
+                        String name = projects.child(id).child("name").getValue().toString();
+                        users.add(new UserModel(email, name));
+                    }
+
+                    callback.onCallback(users);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+    }
+
+    //TODO
+    public static void addUserToList(String currentUserId, String addedUserId, final String listId, final String email){
+        DB.child(FIREBASE_USERS).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot userInfo : dataSnapshot.getChildren()){
+                    if(((String) userInfo.child("email").getValue()).equalsIgnoreCase(email) ){
+                       // userInfo.child(FIREBASE_USER_PROJECTS).child(listId).
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 

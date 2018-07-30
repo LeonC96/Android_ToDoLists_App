@@ -1,8 +1,7 @@
-package com.leonchai.todolists;
+package com.leonchai.todolists.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -12,7 +11,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,8 +26,15 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.leonchai.todolists.fragments.DoFragment;
+import com.leonchai.todolists.fragments.DoingFragment;
+import com.leonchai.todolists.fragments.DoneFragment;
+import com.leonchai.todolists.FirebaseDB;
+import com.leonchai.todolists.R;
 import com.leonchai.todolists.adapters.TaskListAdapter;
+import com.leonchai.todolists.adapters.UsersListAdapter;
 import com.leonchai.todolists.dataModels.TaskListModel;
+import com.leonchai.todolists.dataModels.UserModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +51,14 @@ public class MainActivity extends AppCompatActivity{
     private TaskListAdapter mTaskListAdapter;
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
-    private ActionBarDrawerToggle drawerToggle;
 
     private List<TaskListModel> taskLists;
     private TaskListModel currentTaskList = null;
+
+    private ListView usersListView;
+    private List<UserModel> usersInList;
+    private UsersListAdapter mUsersListAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +107,13 @@ public class MainActivity extends AppCompatActivity{
         setupCreateListBtn();
         setupTaskListNav();
 
+        // Right Side User navigation
+        usersListView = (ListView) findViewById(R.id.usersList);
+        setupUsersListView();
+        setupAddUserBtn();
+
         setupTabs();
+
     }
 
     private void setupTaskListNav() {
@@ -132,19 +147,19 @@ public class MainActivity extends AppCompatActivity{
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Options");
-                final String[] options = new String[]{"Delete", "Add Users"};
+                final String[] options = new String[]{"Delete"};
                 builder.setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         if(options[i].equals("Delete")) {
-                            FirebaseDB.deleteTaskList(selectedTaskList.getId(), user.getUid());
-                            mDrawerLayout.closeDrawers();
-                            Toast.makeText(MainActivity.this, options[i], Toast.LENGTH_SHORT).show();
-                        }
-
-                        if(options[i].equals("Add Users")){
-
+                            if(selectedTaskList.getId().equals(user.getUid())){
+                                Toast.makeText(MainActivity.this, "Cannot Delete Personal List!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                FirebaseDB.deleteTaskList(selectedTaskList.getId(), user.getUid());
+                                mDrawerLayout.closeDrawers();
+                                Toast.makeText(MainActivity.this, options[i], Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 });
@@ -154,9 +169,20 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    // TODO: show users list
+    private void setupUsersListView(){
+        usersInList = new ArrayList<>();
+        mUsersListAdapter = new UsersListAdapter(this, usersInList);
+        usersListView.setAdapter(mUsersListAdapter);
+        FirebaseDB.getListUsers(currentTaskList, new FirebaseDB.FirebaseCallback() {
+            @Override
+            public void onCallback(Object tasks) {
+                usersInList.clear();
+                usersInList.addAll((List<UserModel>) tasks);
+                mUsersListAdapter.notifyDataSetChanged();
+
+            }
+        });
     }
 
     @Override
@@ -187,7 +213,6 @@ public class MainActivity extends AppCompatActivity{
         if(id == R.id.action_users){
             if(mDrawerLayout.isDrawerOpen(GravityCompat.END)){
                 mDrawerLayout.closeDrawer(GravityCompat.END);
-                mActivityTitle = currentTaskList.getName();
             } else {
                 mDrawerLayout.closeDrawers();
                 mDrawerLayout.openDrawer(GravityCompat.END);
@@ -198,7 +223,6 @@ public class MainActivity extends AppCompatActivity{
         if(id == android.R.id.home){
             if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-                mActivityTitle = currentTaskList.getName();
             } else {
                 mDrawerLayout.closeDrawers();
                 fetchTaskLists();
@@ -261,6 +285,45 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
+    //TODO
+    private void setupAddUserBtn(){
+        Button addUserBtn;
+
+        addUserBtn = findViewById(R.id.addUserBtn);
+        addUserBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Add New User");
+
+                final EditText userEmailInput = new EditText(MainActivity.this);
+                userEmailInput.setInputType(InputType.TYPE_CLASS_TEXT);
+                userEmailInput.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary),
+                        PorterDuff.Mode.SRC_ATOP);
+                builder.setView(userEmailInput);
+
+                builder.setPositiveButton("Add User", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+            }
+        });
+    }
+
     private void fetchTaskLists(){
         List<String> defaultUser = new ArrayList<>();
         defaultUser.add(user.getUid());
@@ -308,16 +371,6 @@ public class MainActivity extends AppCompatActivity{
         tabLayout.setupWithViewPager(viewPager);
     }
 
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
 
     @Override
     public void onBackPressed() {

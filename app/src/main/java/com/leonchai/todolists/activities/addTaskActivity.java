@@ -1,4 +1,4 @@
-package com.leonchai.todolists;
+package com.leonchai.todolists.activities;
 
 import android.app.DatePickerDialog;
 import android.graphics.PorterDuff;
@@ -17,6 +17,9 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.leonchai.todolists.fragments.DoFragment;
+import com.leonchai.todolists.FirebaseDB;
+import com.leonchai.todolists.R;
 import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.TaskModel;
 

@@ -1,4 +1,4 @@
-package com.leonchai.todolists;
+package com.leonchai.todolists.activities;
 
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.leonchai.todolists.R;
 import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.TaskModel;
 
