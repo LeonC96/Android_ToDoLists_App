@@ -222,6 +222,29 @@ public class FirebaseDB {
         });
     }
 
+    public static void isUserAlreadyInList(final String email, final String listID, final FirebaseCallback callback){
+
+        DB.child(listID).child(FIREBASE_USERS).addListenerForSingleValueEvent(new ValueEventListener() {
+            boolean isUserInList = false;
+
+            @Override
+            public void onDataChange(DataSnapshot users) {
+                for(DataSnapshot user : users.getChildren()){
+                    if(user.child("email").getValue().toString().equalsIgnoreCase(email)){
+                        isUserInList = true;
+                        break;
+                    }
+                }
+                callback.onCallback(isUserInList);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public interface FirebaseCallback{
         void onCallback(Object tasks);
     }

@@ -212,7 +212,6 @@ public class MainActivity extends AppCompatActivity{
             return true;
         }
 
-        //TODO: refresh users
         if(id == R.id.action_users){
             if(mDrawerLayout.isDrawerOpen(GravityCompat.END)){
                 mDrawerLayout.closeDrawer(GravityCompat.END);
@@ -308,24 +307,14 @@ public class MainActivity extends AppCompatActivity{
                     public void onClick(DialogInterface dialogInterface, int i) {
                         final String addedUserEmail = userEmailInput.getText().toString();
 
-                        //Check if there's a user with inputted email in firebase
-                        auth.fetchProvidersForEmail(addedUserEmail).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+                        FirebaseDB.isUserAlreadyInList(addedUserEmail, currentTaskList.getId(), new FirebaseDB.FirebaseCallback() {
                             @Override
-                            public void onComplete(@NonNull Task<ProviderQueryResult> task) {
-                                if(task.isSuccessful()) {
-                                    if (task.getResult().getProviders().size() > 0) {
-                                        //user exist
-                                        FirebaseDB.addUserToList(user.getUid(), addedUserEmail, currentTaskList.getId(), currentTaskList.getName());
-                                        mDrawerLayout.closeDrawers();
-                                    } else {
-                                        //user doesn't exist
-                                        Toast.makeText(MainActivity.this, "User Does Not Exist", Toast.LENGTH_SHORT).show();
-                                    }
+                            public void onCallback(Object isUserInList) {
+                                if(!(boolean) isUserInList){
+                                    validateAndAddUser(addedUserEmail);
                                 } else {
-                                    //invalid email format
-                                    Toast.makeText(MainActivity.this, "User Does Not Exist", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "User Already In List", Toast.LENGTH_SHORT).show();
                                 }
-
                             }
                         });
                     }
@@ -342,6 +331,29 @@ public class MainActivity extends AppCompatActivity{
                 dialog.show();
                 dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+            }
+        });
+    }
+
+    //Check if there's a user with inputted email in firebase
+    private void validateAndAddUser(final String addedUserEmail){
+        auth.fetchProvidersForEmail(addedUserEmail).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+            @Override
+            public void onComplete(@NonNull Task<ProviderQueryResult> task) {
+                if(task.isSuccessful()) {
+                    if (task.getResult().getProviders().size() > 0) {
+                        //user exist
+                        FirebaseDB.addUserToList(user.getUid(), addedUserEmail, currentTaskList.getId(), currentTaskList.getName());
+                        mDrawerLayout.closeDrawers();
+                    } else {
+                        //user doesn't exist
+                        Toast.makeText(MainActivity.this, "User Does Not Exist", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    //invalid email format
+                    Toast.makeText(MainActivity.this, "User Does Not Exist", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
     }
