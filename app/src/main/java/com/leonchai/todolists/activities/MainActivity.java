@@ -287,7 +287,6 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
-    //TODO: not functional yet
     private void setupAddUserBtn(){
         Button addUserBtn;
 

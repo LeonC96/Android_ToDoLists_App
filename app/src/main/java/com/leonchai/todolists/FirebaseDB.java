@@ -149,9 +149,27 @@ public class FirebaseDB {
         DB.child(listID).child(tableName).child(task.getId()).removeValue();
     }
 
-    public static void deleteTaskList(String listID, String userID){
-        DB.child(listID).removeValue();
-        DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).child(listID).removeValue();
+    public static void deleteTaskList(final String listID, final String userID){
+        DB.child(listID).child(FIREBASE_USERS).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot users) {
+                if(users.getChildrenCount() > 1){
+                    //if there's more than 1 users in list, delete reference to project of the user
+                    users.child(userID).getRef().removeValue();
+
+                } else {
+                    //if there's only 1 user in list, delete list
+                    DB.child(listID).removeValue();
+                }
+                DB.child(FIREBASE_USERS).child(userID).child(FIREBASE_USER_PROJECTS).child(listID).removeValue();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     // get all the users in current to-do list
@@ -177,7 +195,6 @@ public class FirebaseDB {
 
     }
 
-    //TODO
     public static void addUserToList(String currentUserId, final String addedUserEmail, final String listId, final String listName){
 
         DB.child(FIREBASE_USERS).addListenerForSingleValueEvent(new ValueEventListener() {
