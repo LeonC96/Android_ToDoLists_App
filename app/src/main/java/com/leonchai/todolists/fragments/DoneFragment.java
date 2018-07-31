@@ -110,17 +110,17 @@ public class DoneFragment extends Fragment {
                         case DIRECTION_FAR_LEFT:
                             // Move to Done Fragment
                             // Add task to doing fragment list
-                            FirebaseDB.addTask(user.getUid(), DoingFragment.TABLE_NAME,currentTask);
+                            FirebaseDB.addTask(currentTaskList.getId(), DoingFragment.TABLE_NAME,currentTask);
 
                             // Removes task from list and from firebase
                             tasksList.remove(currentPosition);
-                            FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
+                            FirebaseDB.removeTask(currentTaskList.getId(), TABLE_NAME, currentTask);
                             swipeAdapter.notifyDataSetChanged();
                             break;
                         case DIRECTION_FAR_RIGHT:
                             // Delete
                             tasksList.remove(currentPosition);
-                            FirebaseDB.removeTask(user.getUid(), TABLE_NAME, currentTask);
+                            FirebaseDB.removeTask(currentTaskList.getId(), TABLE_NAME, currentTask);
                             swipeAdapter.notifyDataSetChanged();
                             break;
                     }

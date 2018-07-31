@@ -82,20 +82,22 @@ public class MainActivity extends AppCompatActivity{
         if(extras != null){
             if(extras.containsKey(EXTRA_TASKLIST)){
                 currentTaskList = extras.getParcelable(EXTRA_TASKLIST);
-                System.out.println(currentTaskList.getId());
             }
         }
 
+        // if user just logged in go to first list in firebase table
+        //TODO: if personal was deleted
         if(currentTaskList == null){
             List<String> userIDInList = new ArrayList<>();
             userIDInList.add(user.getUid());
-            currentTaskList = new TaskListModel(user.getUid(), "Personal", userIDInList);
+            currentTaskList = new TaskListModel(user.getUid(), "Personal");
         }
 
         // check if new user or existing
         String username = getIntent().getStringExtra(EXTRA_USERNAME);
         if(username != null) {
             FirebaseDB.createUserTable(user.getUid(), username, user.getEmail());
+
         }
 
         mActivityTitle = currentTaskList.getName();
@@ -159,6 +161,14 @@ public class MainActivity extends AppCompatActivity{
                                 FirebaseDB.deleteTaskList(selectedTaskList.getId(), user.getUid());
                                 mDrawerLayout.closeDrawers();
                                 Toast.makeText(MainActivity.this, options[i], Toast.LENGTH_SHORT).show();
+
+                                //taskLists.remove(i);
+                                if(selectedTaskList.getId().equalsIgnoreCase(currentTaskList.getId())) {
+                                    Intent intent = getIntent();
+                                    intent.putExtra(EXTRA_TASKLIST, taskLists.get(0));
+                                    finish();
+                                    startActivity(intent);
+                                }
                             }
                         }
                     }
@@ -256,10 +266,8 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String taskListName = input.getText().toString();
-                        String id = FirebaseDB.createList(user.getUid(), taskListName);
-                        List<String> users = new ArrayList<>();
-                        users.add(user.getUid());
-                        currentTaskList = new TaskListModel(id, taskListName, users);
+                        String id = FirebaseDB.createList(user , taskListName);
+                        currentTaskList = new TaskListModel(id, taskListName);
 
                         Intent intent = getIntent();
                         intent.putExtra(EXTRA_TASKLIST, currentTaskList);
@@ -327,12 +335,11 @@ public class MainActivity extends AppCompatActivity{
     private void fetchTaskLists(){
         List<String> defaultUser = new ArrayList<>();
         defaultUser.add(user.getUid());
-        final TaskListModel userPersonal = new TaskListModel(user.getUid(), "Personal", defaultUser);
+        final TaskListModel userPersonal = new TaskListModel(user.getUid(), "Personal");
         FirebaseDB.getUserLists(user.getUid(), new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(Object taskList) {
                 taskLists.clear();
-                taskLists.add(userPersonal);
                 taskLists.addAll((List<TaskListModel>) taskList);
                 mTaskListAdapter.notifyDataSetChanged();
             }
