@@ -178,15 +178,24 @@ public class FirebaseDB {
     }
 
     //TODO
-    public static void addUserToList(String currentUserId, String addedUserId, final String listId, final String email){
+    public static void addUserToList(String currentUserId, final String addedUserEmail, final String listId, final String listName){
+
         DB.child(FIREBASE_USERS).addListenerForSingleValueEvent(new ValueEventListener() {
+            String name;
+            String addedUserID;
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot userInfo : dataSnapshot.getChildren()){
-                    if(((String) userInfo.child("email").getValue()).equalsIgnoreCase(email) ){
-                       // userInfo.child(FIREBASE_USER_PROJECTS).child(listId).
+            public void onDataChange(DataSnapshot users) {
+                for(DataSnapshot userInfo : users.getChildren()){
+                    if(((String) userInfo.child("email").getValue()).equalsIgnoreCase(addedUserEmail) ){
+                       userInfo.child(FIREBASE_USER_PROJECTS).child(listId).getRef().setValue(listName);
+                       name = userInfo.child("name").getValue().toString();
+                       addedUserID = userInfo.getKey();
                     }
                 }
+
+                DB.child(listId).child(FIREBASE_USERS).child(addedUserID).child("email").setValue(addedUserEmail);
+                DB.child(listId).child(FIREBASE_USERS).child(addedUserID).child("name").setValue(name);
+
             }
 
             @Override
@@ -195,7 +204,6 @@ public class FirebaseDB {
             }
         });
     }
-
 
     public interface FirebaseCallback{
         void onCallback(Object tasks);

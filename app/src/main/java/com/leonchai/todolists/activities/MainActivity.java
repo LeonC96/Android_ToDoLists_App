@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,17 +25,20 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.leonchai.todolists.fragments.DoFragment;
-import com.leonchai.todolists.fragments.DoingFragment;
-import com.leonchai.todolists.fragments.DoneFragment;
+import com.google.firebase.auth.ProviderQueryResult;
 import com.leonchai.todolists.FirebaseDB;
 import com.leonchai.todolists.R;
 import com.leonchai.todolists.adapters.TaskListAdapter;
 import com.leonchai.todolists.adapters.UsersListAdapter;
 import com.leonchai.todolists.dataModels.TaskListModel;
 import com.leonchai.todolists.dataModels.UserModel;
+import com.leonchai.todolists.fragments.DoFragment;
+import com.leonchai.todolists.fragments.DoingFragment;
+import com.leonchai.todolists.fragments.DoneFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,10 +90,8 @@ public class MainActivity extends AppCompatActivity{
         }
 
         // if user just logged in go to first list in firebase table
-        //TODO: if personal was deleted
+        //TODO: if personal was deleted. For now "personal" list can't be delete but may change later
         if(currentTaskList == null){
-            List<String> userIDInList = new ArrayList<>();
-            userIDInList.add(user.getUid());
             currentTaskList = new TaskListModel(user.getUid(), "Personal");
         }
 
@@ -160,7 +162,7 @@ public class MainActivity extends AppCompatActivity{
                             } else {
                                 FirebaseDB.deleteTaskList(selectedTaskList.getId(), user.getUid());
                                 mDrawerLayout.closeDrawers();
-                                Toast.makeText(MainActivity.this, options[i], Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Deleted " + selectedTaskList.getName(), Toast.LENGTH_SHORT).show();
 
                                 //taskLists.remove(i);
                                 if(selectedTaskList.getId().equalsIgnoreCase(currentTaskList.getId())) {
@@ -179,20 +181,11 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
-    // TODO: show users list
+    //show users list
     private void setupUsersListView(){
         usersInList = new ArrayList<>();
         mUsersListAdapter = new UsersListAdapter(this, usersInList);
         usersListView.setAdapter(mUsersListAdapter);
-        FirebaseDB.getListUsers(currentTaskList, new FirebaseDB.FirebaseCallback() {
-            @Override
-            public void onCallback(Object tasks) {
-                usersInList.clear();
-                usersInList.addAll((List<UserModel>) tasks);
-                mUsersListAdapter.notifyDataSetChanged();
-
-            }
-        });
     }
 
     @Override
@@ -219,12 +212,13 @@ public class MainActivity extends AppCompatActivity{
             return true;
         }
 
-        //TODO
+        //TODO: refresh users
         if(id == R.id.action_users){
             if(mDrawerLayout.isDrawerOpen(GravityCompat.END)){
                 mDrawerLayout.closeDrawer(GravityCompat.END);
             } else {
                 mDrawerLayout.closeDrawers();
+                fetchListUsers();
                 mDrawerLayout.openDrawer(GravityCompat.END);
             }
             return true;
@@ -261,7 +255,7 @@ public class MainActivity extends AppCompatActivity{
                         PorterDuff.Mode.SRC_ATOP);
                 builder.setView(input);
 
-                //TODO: Create new task list and redirect to new list
+                //Create new task list and redirect to new list
                 builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -293,7 +287,7 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
-    //TODO
+    //TODO: not functional yet
     private void setupAddUserBtn(){
         Button addUserBtn;
 
@@ -313,7 +307,28 @@ public class MainActivity extends AppCompatActivity{
                 builder.setPositiveButton("Add User", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        final String addedUserEmail = userEmailInput.getText().toString();
 
+                        //Check if there's a user with inputted email in firebase
+                        auth.fetchProvidersForEmail(addedUserEmail).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<ProviderQueryResult> task) {
+                                if(task.isSuccessful()) {
+                                    if (task.getResult().getProviders().size() > 0) {
+                                        //user exist
+                                        FirebaseDB.addUserToList(user.getUid(), addedUserEmail, currentTaskList.getId(), currentTaskList.getName());
+                                        mDrawerLayout.closeDrawers();
+                                    } else {
+                                        //user doesn't exist
+                                        Toast.makeText(MainActivity.this, "User Does Not Exist", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    //invalid email format
+                                    Toast.makeText(MainActivity.this, "User Does Not Exist", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
                     }
                 });
 
@@ -333,15 +348,27 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void fetchTaskLists(){
-        List<String> defaultUser = new ArrayList<>();
-        defaultUser.add(user.getUid());
-        final TaskListModel userPersonal = new TaskListModel(user.getUid(), "Personal");
+        //List<String> defaultUser = new ArrayList<>();
+        //defaultUser.add(user.getUid());
+        //final TaskListModel userPersonal = new TaskListModel(user.getUid(), "Personal");
         FirebaseDB.getUserLists(user.getUid(), new FirebaseDB.FirebaseCallback() {
             @Override
             public void onCallback(Object taskList) {
                 taskLists.clear();
                 taskLists.addAll((List<TaskListModel>) taskList);
                 mTaskListAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void fetchListUsers(){
+        FirebaseDB.getListUsers(currentTaskList, new FirebaseDB.FirebaseCallback() {
+            @Override
+            public void onCallback(Object tasks) {
+                usersInList.clear();
+                usersInList.addAll((List<UserModel>) tasks);
+                mUsersListAdapter.notifyDataSetChanged();
+
             }
         });
     }
