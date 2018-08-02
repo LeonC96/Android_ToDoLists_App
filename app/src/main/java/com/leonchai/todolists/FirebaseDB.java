@@ -129,7 +129,6 @@ public class FirebaseDB {
                 for(DataSnapshot list : dataSnapshot.getChildren()){
                     String id = list.getKey();
                     String name = list.getValue().toString();
-                    //List<String> userIDs = Arrays.asList(list.child("users").getValue().toString().split(","));
                     TaskListModel taskList = new TaskListModel(id, name);
                     listsNames.add(taskList);
                 }

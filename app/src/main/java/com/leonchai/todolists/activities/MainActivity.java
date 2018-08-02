@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity{
                                 mDrawerLayout.closeDrawers();
                                 Toast.makeText(MainActivity.this, "Deleted " + selectedTaskList.getName(), Toast.LENGTH_SHORT).show();
 
-                                //taskLists.remove(i);
+                                taskLists.remove(i);
                                 if(selectedTaskList.getId().equalsIgnoreCase(currentTaskList.getId())) {
                                     Intent intent = getIntent();
                                     intent.putExtra(EXTRA_TASKLIST, taskLists.get(0));
